@@ -58,12 +58,8 @@ class meta_causal_smm():
         res = np.array([0 for i in range(X.shape[0])])
         for nm, cl in  self.base_models.items():
             pred = np.sign(cl.predict(X))
-            #pred = cl.predict(X)
             df = self.base_models_classifiers[nm].decision_function(xnew, isgram = True) 
-            #print(nm)
-            #print(df)
-            res = res + pred * np.exp(df) 
-            #res = res + pred * df  #* (1 + np.sign(df)) / 2 
+            res = res + pred * df 
         return(np.sign(res))
 
     def score(self, X, y):
@@ -78,10 +74,7 @@ class meta_causal_smm():
                 print(nm)
                 scores = 1 - np.abs(y.to_numpy()[:,0] - pred)
                 print(f"    score smm: {self.base_models_classifiers[nm].score(xnew, scores, isgram = True)}") 
-            #print(nm)
-            #print(df)
-            res = res + pred * np.exp(df) 
-            #res = res + pred * df  #* (1 + np.sign(df)) / 2 
+            res = res + pred * df 
         return(np.average(1 - np.abs(np.sign(res) - y.to_numpy()[:,0])))
 
 
