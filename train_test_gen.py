@@ -10,11 +10,9 @@ from smm import smm
 import argparse
 import csv
 
-
-#### fix IGCI
-
-
-
+'''
+script to run experiment over generated data
+'''
 
 parser = argparse.ArgumentParser( )
 parser.add_argument('--rescale', dest='rescale', action='store_true',
@@ -54,11 +52,11 @@ train_time = {}
 print('start meta causal')
 start = time.process_time()
 model = meta_causal_smm({
-                        "CDS" : cdt.causality.pairwise.CDS(),
+                         "CDS" : cdt.causality.pairwise.CDS(),
                          "ANM" : cdt.causality.pairwise.ANM(), 
                          "BivariateFit" : cdt.causality.pairwise.BivariateFit(), 
                          "IGCI" : cdt.causality.pairwise.IGCI(), 
-                        "RECI": cdt.causality.pairwise.RECI()},
+                         "RECI": cdt.causality.pairwise.RECI()},
                         kernel = lambda a,b: rbf_kernel(a, b, 1),
                         C = 10)
 

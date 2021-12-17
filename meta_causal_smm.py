@@ -76,5 +76,3 @@ class meta_causal_smm():
                 print(f"    score smm: {self.base_models_classifiers[nm].score(xnew, scores, isgram = True)}") 
             res = res + pred * df 
         return(np.average(1 - np.abs(np.sign(res) - y.to_numpy()[:,0])))
-
-

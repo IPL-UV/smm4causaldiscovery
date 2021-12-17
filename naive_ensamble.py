@@ -1,6 +1,11 @@
 import numpy as np
 import pandas as pd
 
+'''
+Simple class for a naive ensamble 
+of base bivariate causal discovery  methods
+'''
+
 class naive_ensamble():
 
     def __init__(self, base_models, strategy = 'voting'):
