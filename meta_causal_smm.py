@@ -34,11 +34,10 @@ class meta_causal_smm():
         for nm, cl in  self.base_models.items():
             # obtain base models predictions and scores 
             pred = np.sign(cl.predict(X))
-            pred[pred == 0] = -1
+            # score is +1 if base model is correct, -1 otherwise
             scores = 1 - np.abs(y.to_numpy()[:,0] - pred)
-            #pred = cl.predict(X)
-            #scores = y.to_numpy()[:,0] * pred
-            #print(scores)
+            scores[scores == 0] = -1
+            print(scores)
             # next we learn smm classifier for each model scores
             self.base_models_classifiers[nm] = smm(base_svm = self.base_svm, 
                     kernel = self.kernel, 
@@ -68,6 +67,7 @@ class meta_causal_smm():
         res = np.array([0 for i in range(X.shape[0])])
         for nm, cl in  self.base_models.items():
             pred = np.sign(cl.predict(X))
+            print(pred)
             #pred = cl.predict(X)
             df = self.base_models_classifiers[nm].decision_function(xnew, isgram = True) 
             if self.verbose: 

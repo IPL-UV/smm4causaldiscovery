@@ -2,9 +2,9 @@ library(ggplot2)
 dir.create("images", showWarnings = FALSE)
 
 mechs <- c("nn", "gp_mix" , "gp_add", "polynomial",  "sigmoid_mix", "sigmoid_add")
-sizes <- c(50, 100, 200, 300 ,400)
+sizes <- c(100, 200, 300 ,400, 500)
 n <- 100
-ncoefs <- c(0.2, 0.4, 0.6)
+ncoefs <- c(0.2, 0.4)
 
 
 Dacc <- Dtrain <- Dtest <- 

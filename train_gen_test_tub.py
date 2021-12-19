@@ -35,7 +35,7 @@ print('start meta causal')
 start = time.process_time()
 model = meta_causal_smm({
                         "CDS" : cdt.causality.pairwise.CDS(),
-                         #"ANM" : cdt.causality.pairwise.ANM(), 
+                         "ANM" : cdt.causality.pairwise.ANM(), 
                          "BivariateFit" : cdt.causality.pairwise.BivariateFit(), 
                          "IGCI" : cdt.causality.pairwise.IGCI(), 
                         "RECI": cdt.causality.pairwise.RECI()},
@@ -50,16 +50,16 @@ rcc = cdt.causality.pairwise.RCC(njobs = 1)
 rcc.fit(X, y) 
 
 
-voting = naive_ensamble({
-                        "CDS" : cdt.causality.pairwise.CDS(),
-                         #"ANM" : cdt.causality.pairwise.ANM(), 
-                         "IGCI" : cdt.causality.pairwise.IGCI(), 
-                         "BivariateFit" : cdt.causality.pairwise.BivariateFit(), 
-                        "RECI": cdt.causality.pairwise.RECI()})
+#voting = naive_ensamble({
+#                        "CDS" : cdt.causality.pairwise.CDS(),
+#                         "ANM" : cdt.causality.pairwise.ANM(), 
+#                         "IGCI" : cdt.causality.pairwise.IGCI(), 
+#                         "BivariateFit" : cdt.causality.pairwise.BivariateFit(), 
+#                        "RECI": cdt.causality.pairwise.RECI()})
 
 averaging = naive_ensamble({
                         "CDS" : cdt.causality.pairwise.CDS(),
-                         #"ANM" : cdt.causality.pairwise.ANM(), 
+                         "ANM" : cdt.causality.pairwise.ANM(), 
                          "BivariateFit" : cdt.causality.pairwise.BivariateFit(), 
                          "IGCI" : cdt.causality.pairwise.IGCI(), 
                         "RECI": cdt.causality.pairwise.RECI()}, strategy = '')
@@ -70,7 +70,7 @@ Xt, yt = cdt.data.load_dataset("tuebingen")
 
 methods = { 
         "CDS" : cdt.causality.pairwise.CDS(), 
-        #"ANM" :cdt.causality.pairwise.ANM(), 
+        "ANM" :cdt.causality.pairwise.ANM(), 
         "BivariateFit" : cdt.causality.pairwise.BivariateFit(), 
         "IGCI" : cdt.causality.pairwise.IGCI(),
         "RECI": cdt.causality.pairwise.RECI(),
