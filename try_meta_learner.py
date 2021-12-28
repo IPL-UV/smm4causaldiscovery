@@ -50,7 +50,8 @@ model = meta_causal_smm({
                          "ANM" : cdt.causality.pairwise.ANM(), 
                          "IGCI" : cdt.causality.pairwise.IGCI(), 
                         "RECI": cdt.causality.pairwise.RECI()},
-                        kernel = lambda a,b: rbf_kernel(a, b, args.gamma), verbose = True,  C = args.C)
+                        kernel = lambda a,b: rbf_kernel(a, b, args.gamma), 
+                        verbose = True,  C = args.C)
 
 model.fit(X,y) 
 end = time.process_time() 
