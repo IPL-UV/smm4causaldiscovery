@@ -37,7 +37,6 @@ class meta_causal_smm():
             # score is +1 if base model is correct, -1 otherwise
             scores = 1 - np.abs(y.to_numpy()[:,0] - pred)
             scores[scores == 0] = -1
-            print(scores)
             # next we learn smm classifier for each model scores
             self.base_models_classifiers[nm] = smm(base_svm = self.base_svm, 
                     kernel = self.kernel, 
@@ -48,8 +47,7 @@ class meta_causal_smm():
             if self.verbose:
                 print(nm)
                 print(f"   training score smm: {self.base_models_classifiers[nm].score(self.smm.gram, scores, isgram = True)}") 
-                print(f"   average score {nm}: {accuracy_score(y.to_numpy()[:,0], pred)}")
-
+                print(f"   accuracy score {nm}: {accuracy_score(y.to_numpy()[:,0], pred)}")
    
     def predict(self, X):
         xnew = self.smm.compute_newgram(X.to_numpy())
@@ -67,7 +65,7 @@ class meta_causal_smm():
         res = np.array([0 for i in range(X.shape[0])])
         for nm, cl in  self.base_models.items():
             pred = np.sign(cl.predict(X))
-            print(pred)
+            #print(pred)
             #pred = cl.predict(X)
             df = self.base_models_classifiers[nm].decision_function(xnew, isgram = True) 
             if self.verbose: 
