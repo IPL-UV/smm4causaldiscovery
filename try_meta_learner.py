@@ -8,6 +8,7 @@ import time
 from naive_ensamble import naive_ensamble
 from smm import smm
 import argparse
+from kernels import rbf_kernel_jax
 
 parser = argparse.ArgumentParser( )
 parser.add_argument('--rescale', dest='rescale', action='store_true',
@@ -50,7 +51,8 @@ model = meta_causal_smm({
                          "ANM" : cdt.causality.pairwise.ANM(), 
                          "IGCI" : cdt.causality.pairwise.IGCI(), 
                         "RECI": cdt.causality.pairwise.RECI()},
-                        kernel = lambda a,b: rbf_kernel(a, b, args.gamma), 
+                        kernel = lambda a,b: rbf_kernel_jax({"gamma": args.gamma}, a, b), 
+                        #kernel = lambda a,b: rbf_kernel(a, b, args.gamma), 
                         verbose = True,  C = args.C)
 
 model.fit(X,y) 
