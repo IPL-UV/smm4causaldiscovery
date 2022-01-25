@@ -8,10 +8,12 @@ from sklearn.metrics import accuracy_score
 class meta_causal_smm():
 
     def __init__(self, base_models, kernel = lambda a,b: rbf_kernel(a, b, 1), 
-                 normalize = True, param_grid = None, verbose = False,  **kwargs):
+                 normalize = True, exp_weights = False,param_grid = None, 
+                 verbose = False,  **kwargs):
         self.verbose = verbose 
         self.kernel = kernel 
         self.normalize = normalize 
+        self.exp_weights = exp_weights
         self.base_svm = svm.SVC
         self.kwargs = kwargs 
         self.param_grid = param_grid
@@ -59,21 +61,11 @@ class meta_causal_smm():
         for nm, cl in  self.base_models.items():
             pred = np.sign(cl.predict(X))
             df = self.base_models_classifiers[nm].decision_function(xnew, isgram = True) 
+            if self.exp_weights:
+                df = np.exp(df)
             res = res + pred * df 
         return(np.sign(res))
 
     def score(self, X, y):
-        xnew = self.smm.compute_newgram(X.to_numpy())
-        # obtain base models predictions 
-        res = np.array([0 for i in range(X.shape[0])])
-        for nm, cl in  self.base_models.items():
-            pred = np.sign(cl.predict(X))
-            #print(pred)
-            #pred = cl.predict(X)
-            df = self.base_models_classifiers[nm].decision_function(xnew, isgram = True) 
-            if self.verbose: 
-                print(nm)
-                scores = 1 - np.abs(y.to_numpy()[:,0] - pred)
-                print(f"    score smm: {self.base_models_classifiers[nm].score(xnew, scores, isgram = True)}") 
-            res = res + pred * df 
-        return(np.average(1 - np.abs(np.sign(res) - y.to_numpy()[:,0])))
+        pred = self.predict(X) 
+        return accuracy_score(y.to_numpy()[:,0], pred)
