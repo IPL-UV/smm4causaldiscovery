@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn import svm 
+from sklearn.model_selection import GridSearchCV
 
 '''
 support measure machine
