@@ -1,4 +1,4 @@
-import numpy as np
+import numpy as np 
 import pandas as pd
 from sklearn.metrics.pairwise import rbf_kernel 
 from sklearn import svm
@@ -8,17 +8,19 @@ from sklearn.metrics import accuracy_score
 class meta_causal_smm():
 
     def __init__(self, base_models, kernel = lambda a,b: rbf_kernel(a, b, 1), 
-                 exp_weights = False,
-                 normalize = True, verbose = False,  **kwargs):
+                 normalize = True, exp_weights = False,param_grid = None, 
+                 verbose = False,  **kwargs):
         self.verbose = verbose 
         self.kernel = kernel 
         self.normalize = normalize 
         self.exp_weights = exp_weights
         self.base_svm = svm.SVC
         self.kwargs = kwargs 
+        self.param_grid = param_grid
         self.smm = smm(base_svm = self.base_svm,   
                 kernel = self.kernel,
-                normalize = self.normalize, **kwargs) 
+                normalize = self.normalize,
+                **kwargs) 
         if type(base_models) is dict:
             self.base_models = base_models 
         else:
@@ -26,7 +28,6 @@ class meta_causal_smm():
                              a dictionary 
                              with base models""")
         
-
     def fit(self, X, y):
         self.base_models_classifiers = {} 
         #print("start gram computation")
@@ -43,6 +44,7 @@ class meta_causal_smm():
             self.base_models_classifiers[nm] = smm(base_svm = self.base_svm, 
                     kernel = self.kernel, 
                     normalize = self.normalize, 
+                    param_grid = self.param_grid, 
                     **self.kwargs).set_data_gram(self.smm.training_data, 
                                                     self.smm.gram, self.smm.D)
             self.base_models_classifiers[nm].fit(None, scores) 
@@ -50,6 +52,7 @@ class meta_causal_smm():
                 print(nm)
                 print(f"   training score smm: {self.base_models_classifiers[nm].score(self.smm.gram, scores, isgram = True)}") 
                 print(f"   accuracy score {nm}: {accuracy_score(y.to_numpy()[:,0], pred)}")
+        return self
    
     def predict(self, X):
         xnew = self.smm.compute_newgram(X.to_numpy())

@@ -8,6 +8,8 @@ import time
 from naive_ensamble import naive_ensamble
 from smm import smm
 import argparse
+from kernels import *
+from fixed_IGCI import fIGCI 
 
 parser = argparse.ArgumentParser( )
 parser.add_argument('--rescale', dest='rescale', action='store_true',
@@ -48,9 +50,13 @@ start = time.process_time()
 model = meta_causal_smm({
                         "CDS" : cdt.causality.pairwise.CDS(),
                          "ANM" : cdt.causality.pairwise.ANM(), 
-                         "IGCI" : cdt.causality.pairwise.IGCI(), 
-                        "RECI": cdt.causality.pairwise.RECI()},
-                        kernel = lambda a,b: rbf_kernel(a, b, args.gamma), 
+                         "IGCI" : fIGCI(), 
+                        "RECI": cdt.causality.pairwise.RECI(),
+                        "BV" : cdt.causality.pairwise.BivariateFit()},
+                        kernel = lambda a,b: j_rbf_kernel(a.shape[1] * a.shape[0], 
+                                                          {"gamma": args.gamma},
+                                                          a, b), 
+                        #kernel = lambda a,b: rbf_kernel(a,b,args.gamma),
                         verbose = True,  C = args.C)
 
 model.fit(X,y) 
@@ -62,13 +68,13 @@ print(f'meta smm model fitted in {end-start} seconds')
 voting = naive_ensamble({
                         "CDS" : cdt.causality.pairwise.CDS(),
                          "ANM" : cdt.causality.pairwise.ANM(), 
-                         "IGCI" : cdt.causality.pairwise.IGCI(), 
+                         "IGCI" : fIGCI(), 
                         "RECI": cdt.causality.pairwise.RECI()})
 
 averaging = naive_ensamble({
                         "CDS" : cdt.causality.pairwise.CDS(),
                          "ANM" : cdt.causality.pairwise.ANM(), 
-                         "IGCI" : cdt.causality.pairwise.IGCI(), 
+                         "IGCI" : fIGCI(), 
                         "RECI": cdt.causality.pairwise.RECI()}, strategy = '')
 
 ### testing
@@ -78,7 +84,7 @@ Xt, yt = gen.generate(args.ntest, npoints = args.size, rescale = args.rescale)
 methods = { 
         "CDS" : cdt.causality.pairwise.CDS(), 
         "ANM" :cdt.causality.pairwise.ANM(), 
-        "IGCI" : cdt.causality.pairwise.IGCI(),
+        "IGCI" : fIGCI(),
         "RECI": cdt.causality.pairwise.RECI(),
         'meta': model,
         'voting': voting,
