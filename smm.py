@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn import svm 
+from sklearn.model_selection import GridSearchCV
 
 '''
 support measure machine
@@ -18,13 +19,21 @@ base_svm: something like sklearn.svm.SVC
 
 normalize: bool, default=True
            Whether to normalize the induced kernel. 
+    
+param_grid: None, dict or list of dictionaries,
+            if not None, sklearn.model_selection.GridSearchCV
+            is used to search parameter values for the
+            base SVM.
 '''
+
 class smm():
 
-    def __init__(self, kernel, base_svm = svm.SVC, normalize = True, **params):
+    def __init__(self, kernel, base_svm = svm.SVC, normalize = True,
+            param_grid = None, **params):
         self.svm = base_svm(kernel = 'precomputed', **params)
         self.kernel = kernel
         self.normalize = normalize
+        self.param_grid = param_grid
         self.training_data = None 
         self.D = None
         self.oneclass = False
@@ -38,7 +47,17 @@ class smm():
             self.oneclass = True
             self.thatclass = y[0]
             return self
-        self.svm.fit(self.gram, y)
+        if self.param_grid is None:
+            self.svm.fit(self.gram, y)
+        else:
+            grid = GridSearchCV(
+                    self.svm,
+                    self.param_grid,
+                    refit=True
+                    )
+            grid.fit(self.gram, y) 
+            self.svm = grid.best_estimator_
+
         if verbose:
             print('support vector') 
             print(self.svm.support_)

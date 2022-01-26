@@ -1,14 +1,14 @@
 import cdt
-from meta_causal_smm import meta_causal_smm
 from sklearn.metrics import accuracy_score
 from sklearn.metrics.pairwise import * 
 import numpy as np
 import pandas as pd
 import time
 from naive_ensamble import naive_ensamble
-from smm import smm
 import argparse
 import csv
+from jax_smm_ensamble import SMMEnsamble   
+from utilities import cdt_data_to_numpy
 
 '''
 script to run experiment over generated data
@@ -46,51 +46,51 @@ args = parser.parse_args()
 print(args)
 
 gen = cdt.data.CausalPairGenerator(args.mech, noise_coeff = args.noise_coeff)
-X, y = gen.generate(args.ntrain, npoints = args.size, rescale = args.rescale, njobs = 1)
+X, y = gen.generate(args.ntrain, npoints = args.size, rescale = args.rescale)
+
 
 train_time = {} 
 print('start meta causal')
 start = time.time()
-model = meta_causal_smm({
+model = SMMEnsamble({
     "CDS" : cdt.causality.pairwise.CDS(),
     "ANM" : cdt.causality.pairwise.ANM(), 
     "BivariateFit" : cdt.causality.pairwise.BivariateFit(), 
     "IGCI" : cdt.causality.pairwise.IGCI(), 
     "RECI": cdt.causality.pairwise.RECI()},
-    param_grid = {"C": np.linspace(1e-1, 1e3, 20)},
+    param_grid = {"C": np.logspace(-2, 3, 20)},
     verbose = True,
-    normalize = True,
-    kernel = lambda a,b: rbf_kernel(a, b, 1))
+    gamma = 1)
 
 model.fit(X, y) 
 end = time.time() 
 train_time['meta'] = end - start
 print(f'meta smm model fitted in {end-start} seconds')
 
-#averaging = naive_ensamble({
-#    "CDS" : cdt.causality.pairwise.CDS(),
-#    "ANM" : cdt.causality.pairwise.ANM(), 
-#    "BivariateFit" : cdt.causality.pairwise.BivariateFit(), 
-#    "IGCI" : cdt.causality.pairwise.IGCI(), 
-#    "RECI": cdt.causality.pairwise.RECI()}, strategy = '')
+averaging = naive_ensamble({
+    "CDS" : cdt.causality.pairwise.CDS(),
+    "ANM" : cdt.causality.pairwise.ANM(), 
+    "BivariateFit" : cdt.causality.pairwise.BivariateFit(), 
+    "IGCI" : cdt.causality.pairwise.IGCI(), 
+    "RECI": cdt.causality.pairwise.RECI()}, strategy = '')
 
-#start = time.time()
-#jarfo = cdt.causality.pairwise.Jarfo()
-#jarfo.fit(X, y) 
-#end = time.time()
-#train_time['jarfo'] = end - start
-#print('jarfo fitted') 
+start = time.time()
+jarfo = cdt.causality.pairwise.Jarfo()
+jarfo.fit(X, y) 
+end = time.time()
+train_time['jarfo'] = end - start
+print('jarfo fitted') 
 
-#start = time.time()
-#rcc = cdt.causality.pairwise.RCC(njobs = 1)
-#rcc.fit(X, y) 
-#end = time.time()
-#train_time['rcc'] = end - start
-#print('rcc fitted') 
+start = time.time()
+rcc = cdt.causality.pairwise.RCC(njobs = 1)
+rcc.fit(X, y) 
+end = time.time()
+train_time['rcc'] = end - start
+print('rcc fitted') 
 
 
 ### testing
-Xt, yt = gen.generate(args.ntest, npoints = args.size, rescale = args.rescale, njobs = 1)
+Xt, yt = gen.generate(args.ntest, npoints = args.size, rescale = args.rescale)
 
 
 methods = { 
@@ -101,7 +101,7 @@ methods = {
         "RECI": cdt.causality.pairwise.RECI(),
         'meta': model,
         #'voting': voting,
-        #'averaging': averaging,
+        'averaging': averaging,
         'jarfo': jarfo,
         'rcc': rcc}
 
@@ -112,8 +112,6 @@ acc = {}
 for nm,mth in methods.items():
     start = time.time()
     pr = mth.predict(Xt) 
-    if nm == 'ÏGCI':
-        pr = -pr 
     end = time.time()
     test_time[nm] = end - start
     acc[nm] = accuracy_score(yt, np.sign(pr))

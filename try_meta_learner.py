@@ -8,7 +8,6 @@ import time
 from naive_ensamble import naive_ensamble
 from smm import smm
 import argparse
-from kernels import *
 from fixed_IGCI import fIGCI 
 
 parser = argparse.ArgumentParser( )
@@ -50,13 +49,10 @@ start = time.process_time()
 model = meta_causal_smm({
                         "CDS" : cdt.causality.pairwise.CDS(),
                          "ANM" : cdt.causality.pairwise.ANM(), 
-                         "IGCI" : fIGCI(), 
-                        "RECI": cdt.causality.pairwise.RECI(),
-                        "BV" : cdt.causality.pairwise.BivariateFit()},
-                        kernel = lambda a,b: j_rbf_kernel(a.shape[1] * a.shape[0], 
-                                                          {"gamma": args.gamma},
-                                                          a, b), 
-                        #kernel = lambda a,b: rbf_kernel(a,b,args.gamma),
+                         "IGCI" : cdt.causality.pairwise.IGCI(), 
+                        "RECI": cdt.causality.pairwise.RECI()},
+                        kernel = lambda a,b: rbf_kernel(a, b, gamma = 1), 
+                        #kernel = lambda a,b: rbf_kernel(a, b, args.gamma), 
                         verbose = True,  C = args.C)
 
 model.fit(X,y) 

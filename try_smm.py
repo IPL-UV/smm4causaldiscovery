@@ -23,6 +23,7 @@ X = np.array([
 
 print('smm with rbf_kernel(1)')
 model = smm(kernel = lambda a,b: rbf_kernel(a, b, 1), normalize = True)
+
 model.fit(x = X, y = Y)
 
 print("predicted labels") 
@@ -60,8 +61,8 @@ print("smm with NuSVC and polynomial(10) kernel")
 model = smm(kernel = lambda a,b: polynomial_kernel(a, b, 10),  
         base_svm = svm.NuSVC,  
         nu = 0.5,
-        batch = 3,
         normalize = True)
+
 model.fit(x = X, y = Y, verbose = True)
 
 print("predicted labels") 
@@ -85,7 +86,6 @@ Y = labels.to_numpy()[:,0]
 print("smm with SVR and  rbf(100) kernel")
 model = smm(kernel = lambda a,b: rbf_kernel(a, b, 100), 
         base_svm = svm.SVC,
-        batch = 4, 
         normalize = True)
 model.fit(x = X, y = Y)
 
