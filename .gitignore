@@ -1,7 +1,5 @@
 *.swp
 data/
-experiments/
-jax_experiments/
 *.pdf
 __pycache__/
 *.Rhistory
