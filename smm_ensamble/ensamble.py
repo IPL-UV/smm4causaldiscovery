@@ -42,6 +42,7 @@ class SMMEnsamble():
         if self.verbose:
             print(f'gram computation in {end - start} seconds')
 
+        self.oneclass_signs = {}
         # this could run in parallel 
         for nm, cl in  self.base_models.items():
             # obtain base models predictions and scores 
@@ -49,9 +50,17 @@ class SMMEnsamble():
             # score is +1 if base model is correct, -1 otherwise
             scores = 1 - np.abs(y.to_numpy()[:,0] - pred)
             scores[scores == 0] = -1
-            # next we learn smm classifier for each model scores
-            model =  svm.SVC(kernel="precomputed", C=self.C)
-            if self.param_grid is None:
+            if all([score == scores[0] for score in scores]):
+                if self.verbose:
+                    print(f'score for {nm} is always {scores[0]}')
+                model = svm.OneClassSVM(kernel='precomputed')
+                one_class = True
+                self.oneclass_signs[nm] = scores[0]
+            else:
+                model =  svm.SVC(kernel="precomputed", C=self.C)
+                one_class = False
+                self.oneclass_signs[nm] = 1.0
+            if self.param_grid is None or one_class:
                 model.fit(gram, scores)
             else:
                 grid = GridSearchCV(
@@ -63,8 +72,11 @@ class SMMEnsamble():
                 model = grid.best_estimator_
             # save classifier for the method
             self.base_models_classifiers[nm] = model 
-            self.smm_scores[nm] = model.score(gram, scores)
-            self.base_scores[nm] = accuracy_score(y.to_numpy()[:,0], pred) 
+            if one_class:
+                self.smm_scores[nm] = 1.0
+            else:
+                self.smm_scores[nm] = model.score(gram, scores)
+            self.base_scores[nm] = accuracy_score(y, pred) 
             if self.verbose:
                 print(nm)
                 print(f"training score smm: {self.smm_scores[nm]}") 
@@ -93,7 +105,7 @@ class SMMEnsamble():
         for nm, pr in self.base_predictions.items(): 
             model = self.base_models_classifiers[nm]
             # get classifier decision function
-            df = model.decision_function(xnew) 
+            df = model.decision_function(xnew) * self.oneclass_signs[nm] 
             res += np.sign(pr) * df 
 
         return np.sign(res) 
@@ -123,6 +135,7 @@ class SMMEnsamble():
                    "vot": accuracy_score(np.sign(vot), y),
                    "best": accuracy_score(np.sign(best), y)}
         return scores
+
 
     def score(self, X, y):
         pred = self.predict(X) 

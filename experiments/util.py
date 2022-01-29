@@ -5,14 +5,14 @@ import cdt
 
 def save_csv(data, path):
     csv_file = path
-    csv_columns = list(data.keys()) 
+    csv_columns = list(data[0].keys()) 
     
     try:
         with open(csv_file, 'w') as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
             writer.writeheader()
             for d in data:
-                write.writerow(d)
+                writer.writerow(d)
 
     except IOError:
         print("I/O error")
