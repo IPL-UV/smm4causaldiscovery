@@ -7,9 +7,9 @@ import os
 gamma = 100
 nrep = 10
 mechs = ('nn', 'gp_add', 'gp_mix', 'polynomial', 'sigmoid_add', 'sigmoid_mix')
-ntrains = (50, 100)
+ntrains = (100,)
 ntests = (100,)
-sizes = (50, 100, 250, 500, 1000)
+sizes = (50, 100, 250, 500, 750, 1000)
 ncoeffs = (0.4,)
 
 exp_set = product(mechs, sizes, ntrains, ntests, ncoeffs)

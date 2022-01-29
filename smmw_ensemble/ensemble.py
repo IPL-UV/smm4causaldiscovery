@@ -8,18 +8,21 @@ from .kernels import kme_rbf
 
 class SMMwEnsemble():
 
-    def __init__(self, base_models,
+    def __init__(self, base_methods,
+            include_constant=True,
             gamma=1.0, 
             exp_weights=False,
             param_grid=None, 
             C=1.0,
             verbose = False):
-        if type(base_models) is dict:
-            self.base_models = base_models 
+        if type(base_methods) is dict:
+            self.base_methods = base_methods 
         else:
-            raise Exception("""base_models argument should be 
+            raise Exception("""base_methods argument should be 
                              a dictionary 
-                             with base models""")
+                             with base methods""")
+
+        self.include_constant = include_constant
         self.verbose = verbose 
         self.gamma = gamma 
         self.C = C
@@ -27,9 +30,11 @@ class SMMwEnsemble():
         self.param_grid = param_grid
 
     def fit(self, X, y):
+        if self.include_constant:
+            self.base_methods.update({"_constant": None})
         # data to jax array
         jX = cdt_data_to_jax(X)
-        self.base_models_classifiers = {} 
+        self.base_methods_classifiers = {} 
         self.base_scores = {} 
         self.smm_scores = {} 
         # save training data
@@ -41,12 +46,14 @@ class SMMwEnsemble():
         end = time.time()
         if self.verbose:
             print(f'gram computation in {end - start} seconds')
-
         self.oneclass_signs = {}
         # this could run in parallel 
-        for nm, cl in  self.base_models.items():
-            # obtain base models predictions and scores 
-            pred = np.sign(cl.predict(X))
+        for nm, cl in  self.base_methods.items():
+            # obtain base methods predictions and scores 
+            if cl is  None:
+                pred = np.ones(X.shape[0]) 
+            else: 
+                pred = np.sign(cl.predict(X))
             # score is +1 if base model is correct, -1 otherwise
             scores = 1 - np.abs(y.to_numpy()[:,0] - pred)
             scores[scores == 0] = -1
@@ -71,7 +78,7 @@ class SMMwEnsemble():
                 grid.fit(gram, scores) 
                 model = grid.best_estimator_
             # save classifier for the method
-            self.base_models_classifiers[nm] = model 
+            self.base_methods_classifiers[nm] = model 
             if one_class:
                 self.smm_scores[nm] = 1.0
             else:
@@ -94,16 +101,19 @@ class SMMwEnsemble():
         if self.verbose:
             print(f'test gram computed in {end - start} seconds')
 
-        # get all the base models predictions 
+        # get all the base methods predictions 
         self.base_predictions = {}
-        for nm, cl in self.base_models.items():
+        for nm, cl in self.base_methods.items():
             # obtain base model predictions 
-            self.base_predictions[nm] = cl.predict(X)
+            if cl is None:
+                self.base_predictions[nm] = np.ones(X.shape[0])
+            else:
+                self.base_predictions[nm] = cl.predict(X)
 
         res = np.zeros(jX.shape[0])
         # compute weighted average, simple average, voting
         for nm, pr in self.base_predictions.items(): 
-            model = self.base_models_classifiers[nm]
+            model = self.base_methods_classifiers[nm]
             # get classifier decision function
             df = model.decision_function(xnew) * self.oneclass_signs[nm] 
             res += np.sign(pr) * df 
@@ -127,8 +137,10 @@ class SMMwEnsemble():
         best = np.zeros(y.shape[0])
         # compute weighted average, simple average, voting
         for nm, pr in self.base_predictions.items(): 
-            avg += pr 
-            vot += np.sign(pr)
+            if nm != "_constant":
+               print(nm)
+               avg += pr 
+               vot += np.sign(pr)
             if nm == self.best_base:
                 best = np.sign(pr)
         scores = { "avg": accuracy_score(np.sign(avg), y), 
