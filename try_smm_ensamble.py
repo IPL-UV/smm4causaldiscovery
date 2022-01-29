@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import time
 import argparse
-from smm_ensamble import SMMEnsamble 
+from smmw_ensemble import SMMwEnsemble 
 import base_methods
 
 parser = argparse.ArgumentParser( )
@@ -40,7 +40,7 @@ X, y = gen.generate(args.ntrain, npoints = args.size, rescale = args.rescale)
 
 print('start meta causal')
 start = time.process_time()
-model = SMMEnsamble({
+model = SMMwEnsemble({
                         "CDS" : cdt.causality.pairwise.CDS(),
                          "ANM" : cdt.causality.pairwise.ANM(), 
                          "IGCI" : base_methods.fIGCI(), 
@@ -63,7 +63,7 @@ scores_alternatives  = model.score_alternatives(yt.to_numpy()[:,0])
 scores_base = model.score_base(yt.to_numpy()[:,0])
 
 
-print(f'score smm-weighted ensamble: {score}')
+print(f'score smm-weighted ensemble: {score}')
 
 print(scores_alternatives)
 

@@ -3,7 +3,7 @@ from sklearn.metrics import accuracy_score
 import time
 import argparse
 from .util import save_csv
-from smm_ensamble import SMMEnsamble
+from smmw_ensemble import SMMwEnsemble
 import numpy as np
 from base_methods import fIGCI
 
@@ -20,7 +20,7 @@ def run(mech='nn', ntrain=100, ntest=100, size=100, noise_coeff=0.4, gamma = 100
     train_time = {} 
     print('start meta causal')
     start = time.time()
-    model = SMMEnsamble({
+    model = SMMwEnsemble({
         "CDS" : cdt.causality.pairwise.CDS(),
         "ANM" : cdt.causality.pairwise.ANM(), 
         "BivariateFit" : cdt.causality.pairwise.BivariateFit(), 
@@ -32,8 +32,8 @@ def run(mech='nn', ntrain=100, ntest=100, size=100, noise_coeff=0.4, gamma = 100
     
     model.fit(X, y) 
     end = time.time() 
-    train_time['smm_ensamble'] = end - start
-    print(f'smm enamblel fitted in {end-start} seconds')
+    train_time['smm_ensemble'] = end - start
+    print(f'smm-w ensemble fitted in {end-start} seconds')
 
     # fit jarfo 
     start = time.time()
@@ -41,7 +41,7 @@ def run(mech='nn', ntrain=100, ntest=100, size=100, noise_coeff=0.4, gamma = 100
     jarfo.fit(X,y) 
     end = time.time()
     train_time['jarfo'] = end - start
-    print(f'jarfo fitted in {end-start} second') 
+    print(f'jarfo fitted in {end-start} seconds') 
 
     #fit rcc 
     start = time.time()
@@ -49,7 +49,7 @@ def run(mech='nn', ntrain=100, ntest=100, size=100, noise_coeff=0.4, gamma = 100
     rcc.fit(X,y)
     end = time.time()
     train_time['rcc'] = end - start
-    print(f'rcc fitted in {end-start} second') 
+    print(f'rcc fitted in {end-start} seconds') 
 
     # testing
     Xt, yt = gen.generate(ntest, npoints=size, rescale=rescale)
@@ -60,7 +60,7 @@ def run(mech='nn', ntrain=100, ntest=100, size=100, noise_coeff=0.4, gamma = 100
     start = time.time()
     smm_score = model.score(Xt,yt) 
     end = time.time() 
-    test_time['smm_ensamble'] = end - start
+    test_time['smm_ensemble'] = end - start
 
     # jarfo 
     start = time.time()
@@ -75,12 +75,12 @@ def run(mech='nn', ntrain=100, ntest=100, size=100, noise_coeff=0.4, gamma = 100
     test_time['rcc'] = end - start
 
     #get all scores 
-    scores = {'smm_ensamble': smm_score, 
+    scores = {'smm_ensemble': smm_score, 
               "jarfo": jarfo_score,
               "rcc": rcc_score
               }
 
-    # add scores of alternative ensambles
+    # add scores of alternative ensembles
     scores.update(model.score_alternatives(yt))
     # add scores of base methods
     scores.update(model.score_base(yt))

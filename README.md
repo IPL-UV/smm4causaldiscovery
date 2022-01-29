@@ -1,14 +1,35 @@
-`smm.py` is the basic Support measure machine classifier it works with any SVM method from sklearn and any kernel passed as callable (check try_smm.py for examples)
+## Combining Pairwise Causal Discovery Methods with Support Measure Machines
 
-`meta_causal_smm.py` is the meta method which builds one smm classifier per base algorithms (given as dictionary) and then average base algorithms decisions with the smm decision functions (depends on smm.py
+This repo contains the code to replicate the experiments in the manuscript 
+`Combining Pairwise Causal Discovery Methods with Support Measure Machines` 
 
 
-`try_meta_learner.py` is an example script for testing the meta method plus the base alg and pure smm, it accepts command line arguments to specify mechanism ntrain ntest and sample size
+### requirements 
 
-`train_test_gen.py` is similar to `try_meta_learner.py` but it saves the results to a csv files (name can be passed via -o outfile.csv ) and computes execution times
+Experiments are run on python v3.8.12. We use the framework for pairwise causal
+discovery implemented in the [The Causal Discovery
+Toolbox](https://fentechsolutions.github.io/CausalDiscoveryToolbox/html/index.html).
+Our method relies on kernel computed using [JAX](https://github.com/google/jax) 
+and SVM available through the
+[sklearn wrappers of
+libsvm](https://scikit-learn.org/stable/modules/classes.html#module-sklearn.svm). 
 
-`run_experiment.sh` is a bash script that runs a lot of experiments using tmux, to be used mainly in the server but also locally but carefully if you do not want to use all your cpus
+The complete list of required python packages is in [`requirements.txt`](requirements.txt). 
 
-`train_gen_test_tub.py` is to train on generated data and test on tubingen, but ANM was not working on tuebingen
+Additionally, the scripts to generate figures ar wrritten in R and requires the 
+`ggplot2` package.
 
-only requirements are `sklearn , numpy, pandas, cdt`
+
+### SMM weighted ensemble 
+
+We implement our proposed method in the `SMMwEnsemble` class available in 
+`smmw_ensemble/ensemble.py`. 
+An object of this class is instantiated with the following code:
+
+```
+from smmw_ensemble import SMMwEnsemble
+from cdt.causality.pairwise import CDS, ANM
+
+model = SMMwEnsemble({"CDS": CDS(), "ANM": ANM()},
+                     gamma = 10)
+```

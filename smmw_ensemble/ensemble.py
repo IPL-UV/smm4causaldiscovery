@@ -6,7 +6,7 @@ import time
 from .util import cdt_data_to_jax
 from .kernels import kme_rbf 
 
-class SMMEnsamble():
+class SMMwEnsemble():
 
     def __init__(self, base_models,
             gamma=1.0, 
