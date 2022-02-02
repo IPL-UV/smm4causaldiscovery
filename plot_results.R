@@ -71,8 +71,8 @@ ggsave(
 
 
 plot_acc2 <- ggplot(
-  D[D$alg %in% c("smm_ensemble", "rcc", "jarfo"), ] & 
-    D$variable == "acc",
+  D[D$alg %in% c("smm_ensemble", "rcc", "jarfo")  & 
+    D$variable == "acc",],
   aes(
     x = size,
     y = value,
