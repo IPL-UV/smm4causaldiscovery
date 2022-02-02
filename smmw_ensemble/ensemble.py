@@ -116,6 +116,8 @@ class SMMwEnsemble():
             model = self.base_methods_classifiers[nm]
             # get classifier decision function
             df = model.decision_function(xnew) * self.oneclass_signs[nm] 
+            if self.exp_weights:
+                df = np.exp(df)
             res += np.sign(pr) * df 
 
         return np.sign(res) 
