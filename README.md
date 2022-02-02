@@ -16,8 +16,9 @@ libsvm](https://scikit-learn.org/stable/modules/classes.html#module-sklearn.svm)
 
 The complete list of required python packages is in [`requirements.txt`](requirements.txt). 
 
-Additionally, the scripts to generate figures ar wrritten in R and requires the 
-`ggplot2` package.
+Additionally, the scripts to generate figures are written in R and requires the 
+`ggplot2` package (optionally the `colorblindr``package can be used to check plots
+under color blindness).
 
 
 ### SMM weighted ensemble 
