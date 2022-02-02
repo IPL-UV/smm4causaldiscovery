@@ -27,7 +27,7 @@ def kme_rbf(p: jnp.ndarray, q: jnp.ndarray, gamma: float) -> jnp.ndarray:
     """Kernel Mean Embedding 
     This function computes the kernel matrix (or Gram matrix)
     between the kernel mean embeddings of the samples in p and q. 
-    The base kernel used is the 2d. 
+    The base kernel used is the 2d RBF kernel. 
     Parameters
     ----------
     p : jax.numpy.ndarray
