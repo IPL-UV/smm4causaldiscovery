@@ -26,9 +26,13 @@ def run(mech='nn', ntrain=100, ntest=100, size=100, noise_coeff=0.4, gamma = 100
         "BivariateFit" : cdt.causality.pairwise.BivariateFit(), 
         "IGCI" : fIGCI(), 
         "RECI": cdt.causality.pairwise.RECI()},
-        param_grid = {"C": np.linspace(1e-1, 1e3, 20)},
-        verbose = True,
-        gamma = gamma)
+        include_constant=True,
+        exp_weights=False,
+        param_grid = {"C": np.logspace(-2, 3, 20)},
+        parallel=True,
+        njobs=5,
+        verbose=True,
+        gamma=gamma)
     
     model.fit(X, y) 
     end = time.time() 
