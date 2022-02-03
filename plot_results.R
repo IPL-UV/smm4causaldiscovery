@@ -4,10 +4,10 @@ source("plot_util.R")
 
 dir.create("images", showWarnings = FALSE)
 
-mechs <- c("nn", "polynomial", "sigmoid_add", "sigmoid_mix")
-sizes <- c(50, 100, 250, 500, 750, 1000)
+mechs <- c("nn")
+sizes <- c(50, 100, 250, 500)
 ntrains <- c(100)
-ncoefs <- c(0.2, 0.4, 0.6)
+ncoefs <- c(0.2)
 ntests <- 100
 gammas <- 1
 
@@ -163,7 +163,7 @@ ggsave(paste0("images/time_exp.pdf"),
 mechs <- c("nn")
 sizes <- c(250)
 ntrains <- c(100, 250, 500, 750, 1000)
-ncoefs <- c(0.2, 0.4)
+ncoefs <- c(0.2, 0.4, 0.6)
 ntests <- 1000
 gammas <- 1
 

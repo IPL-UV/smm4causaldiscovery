@@ -18,7 +18,7 @@ class SMMwEnsemble():
             C=1.0,
             parallel=True,
             njobs=cpu_count() - 1,
-            verbose = False):
+            verbose=False):
         if type(base_methods) is dict:
             self.base_methods = base_methods 
         else:
