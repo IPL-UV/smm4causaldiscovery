@@ -19,11 +19,11 @@ print(args)
 if args.generated1:
     gamma = 1
     nrep = 10
-    mechs = ('nn', 'polynomail', 'sigmoid_add', 'sigmoid_mix',)
+    mechs = ('nn', 'polynomial', 'sigmoid_add', 'sigmoid_mix', 'gp_add', 'gp_mix')
     ntrains = (100,)
     ntests = (100,)
-    sizes = (50, 100, 250, 500, 750, 1000)
-    ncoeffs = (0.4, 0.6)
+    sizes = (50, 100, 250, 500)
+    ncoeffs = (0.2, 0.4, 0.6)
     
     exp_set = product(mechs, ncoeffs, sizes, ntrains, ntests)
     for (mech, ncoeff, size, ntrain, ntest) in exp_set:
@@ -38,7 +38,7 @@ if args.generated1:
 if args.generated2:
     gamma = 1
     nrep = 10
-    mechs = ('nn', 'polynomail', 'sigmoid_add', 'sigmoid_mix',)
+    mechs = ('nn', 'polynomial', 'sigmoid_add', 'sigmoid_mix',)
     ntrains = (100, 250, 500, 750, 1000)
     ntests = (1000,)
     sizes = (250,)
