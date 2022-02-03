@@ -1,6 +1,12 @@
 import csv
 import pandas as pd
 import cdt 
+import numpy as np
+
+
+def save_csv2(data, path):
+    pd.DataFrame.from_dict(data).to_csv(path)
+
 
 
 def save_csv(data, path):

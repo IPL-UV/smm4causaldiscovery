@@ -28,7 +28,7 @@ def run(mech='nn', ntrain=100, ntest=100, size=100, noise_coeff=0.4, gamma = 100
         "RECI": cdt.causality.pairwise.RECI()},
         include_constant=True,
         exp_weights=False,
-        param_grid = {"C": np.logspace(-2, 3, 20)},
+        param_grid = {"C": np.logspace(-3, 5, 20)},
         parallel=True,
         njobs=5,
         verbose=True,
@@ -89,4 +89,4 @@ def run(mech='nn', ntrain=100, ntest=100, size=100, noise_coeff=0.4, gamma = 100
     # add scores of base methods
     scores.update(model.score_base(yt))
 
-    return (scores, train_time, test_time)
+    return (scores, train_time, test_time, model.smms_df)
