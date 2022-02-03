@@ -30,6 +30,10 @@ parser.add_argument('-g', '--gamma', dest='gamma', action='store',
                     type = float,
                     default = 1, 
                     help='gamma Gaussain RBF')
+parser.add_argument('-p', '--parallel', dest='parallel', action='store_true',
+                    help='use parallel')
+
+
 
 args = parser.parse_args()
 print(args)
@@ -43,10 +47,15 @@ start = time.process_time()
 model = SMMwEnsemble({
                         "CDS" : cdt.causality.pairwise.CDS(),
                          "ANM" : cdt.causality.pairwise.ANM(), 
+                        # "ANM-CL" : base_methods.ANM_CL(), 
                          "IGCI" : base_methods.fIGCI(), 
+                         #"fRECI": base_methods.fRECI(),
                         "RECI": cdt.causality.pairwise.RECI()},
+                        include_constant=False,
                         param_grid = {"C": np.logspace(-2, 3, 20)},
                         gamma = args.gamma, 
+                        parallel=args.parallel,
+                        njobs = 4,
                         verbose = True)
 
 model.fit(X,y) 

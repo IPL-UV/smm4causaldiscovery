@@ -5,6 +5,8 @@ import numpy as np
 import time
 from .util import cdt_data_to_jax
 from .kernels import kme_rbf 
+from os import cpu_count
+from joblib import Parallel, delayed
 
 class SMMwEnsemble():
 
@@ -14,6 +16,8 @@ class SMMwEnsemble():
             exp_weights=False,
             param_grid=None, 
             C=1.0,
+            parallel=True,
+            njobs=cpu_count() - 1,
             verbose = False):
         if type(base_methods) is dict:
             self.base_methods = base_methods 
@@ -28,6 +32,8 @@ class SMMwEnsemble():
         self.C = C
         self.exp_weights = exp_weights
         self.param_grid = param_grid
+        self.parallel = parallel
+        self.njobs = njobs
 
     def fit(self, X, y):
         if self.include_constant:
@@ -37,6 +43,8 @@ class SMMwEnsemble():
         self.base_methods_classifiers = {} 
         self.base_scores = {} 
         self.smm_scores = {} 
+        self.oneclass_signs = {}
+
         # save training data
         self.Xtrain = jX
 
@@ -44,52 +52,61 @@ class SMMwEnsemble():
         start = time.time()
         gram = kme_rbf(jX, jX, self.gamma)
         end = time.time()
+
         if self.verbose:
             print(f'gram computation in {end - start} seconds')
-        self.oneclass_signs = {}
-        # this could run in parallel 
-        for nm, cl in  self.base_methods.items():
-            # obtain base methods predictions and scores 
-            if cl is  None:
-                pred = np.ones(X.shape[0]) 
-            else: 
-                pred = np.sign(cl.predict(X))
-            # score is +1 if base model is correct, -1 otherwise
+
+       # get all the base methods predictions 
+        if self.parallel:
+            base_preds = Parallel(n_jobs=self.njobs)\
+                    (delayed(_predict_base)(nm, cl, X) \
+                                for nm, cl in self.base_methods.items())
+        else:
+            base_preds = (_predict_base(nm, cl, X) for nm, cl in self.base_methods.items())
+
+        # train base classifiers 
+        for nmpred in base_preds:
+            nm = nmpred[0]
+            pred = np.sign(nmpred[1])
+
             scores = 1 - np.abs(y.to_numpy()[:,0] - pred)
             scores[scores == 0] = -1
             if all([score == scores[0] for score in scores]):
                 if self.verbose:
                     print(f'score for {nm} is always {scores[0]}')
+        
                 model = svm.OneClassSVM(kernel='precomputed')
                 one_class = True
-                self.oneclass_signs[nm] = scores[0]
+                oneclass_sign = scores[0]
             else:
                 model =  svm.SVC(kernel="precomputed", C=self.C)
                 one_class = False
-                self.oneclass_signs[nm] = 1.0
+                oneclass_sign = 1.0
             if self.param_grid is None or one_class:
                 model.fit(gram, scores)
             else:
                 grid = GridSearchCV(
                         model,
                         self.param_grid,
-                        refit=True
-                        )
+                        refit=True)
                 grid.fit(gram, scores) 
                 model = grid.best_estimator_
             # save classifier for the method
-            self.base_methods_classifiers[nm] = model 
+            self.base_methods_classifiers[nm] = model
+            self.oneclass_signs[nm] = oneclass_sign
             if one_class:
                 self.smm_scores[nm] = 1.0
             else:
                 self.smm_scores[nm] = model.score(gram, scores)
-            self.base_scores[nm] = accuracy_score(y, pred) 
+            self.base_scores[nm] = accuracy_score(y.to_numpy()[:,0], pred) 
             if self.verbose:
                 print(nm)
                 print(f"training score smm: {self.smm_scores[nm]}") 
                 print(f"accuracy score {nm}: {self.base_scores[nm]}")
+
         self.best_base = max(self.base_scores, key=self.base_scores.get)
         return self
+
 
 
     def predict(self, X):
@@ -103,12 +120,18 @@ class SMMwEnsemble():
 
         # get all the base methods predictions 
         self.base_predictions = {}
-        for nm, cl in self.base_methods.items():
-            # obtain base model predictions 
-            if cl is None:
-                self.base_predictions[nm] = np.ones(X.shape[0])
-            else:
-                self.base_predictions[nm] = cl.predict(X)
+        if self.parallel:
+            base_preds = Parallel(n_jobs=self.njobs)\
+                    (delayed(_predict_base)(
+                        nm,
+                        cl, 
+                        X) \
+                                for nm, cl in self.base_methods.items())
+        else:
+            base_preds = (_predict_base(nm, cl, X) for nm, cl in self.base_methods.items())
+
+        for pred in base_preds:
+            self.base_predictions[pred[0]] = pred[1] 
 
         res = np.zeros(jX.shape[0])
         # compute weighted average, simple average, voting
@@ -154,3 +177,11 @@ class SMMwEnsemble():
     def score(self, X, y):
         pred = self.predict(X) 
         return accuracy_score(y, pred)
+
+
+def _predict_base(nm, cl, X):
+    # obtain base model predictions 
+    if cl is None:
+        return nm, np.ones(X.shape[0])
+    else:
+        return nm, cl.predict(X)
