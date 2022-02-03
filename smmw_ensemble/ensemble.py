@@ -134,11 +134,13 @@ class SMMwEnsemble():
             self.base_predictions[pred[0]] = pred[1] 
 
         res = np.zeros(jX.shape[0])
+        self.smms_df = {}
         # compute weighted average, simple average, voting
         for nm, pr in self.base_predictions.items(): 
             model = self.base_methods_classifiers[nm]
             # get classifier decision function
             df = model.decision_function(xnew) * self.oneclass_signs[nm] 
+            self.smms_df[nm] = df
             if self.exp_weights:
                 df = np.exp(df)
             res += np.sign(pr) * df 
