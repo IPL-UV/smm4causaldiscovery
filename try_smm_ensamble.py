@@ -45,13 +45,12 @@ X, y = gen.generate(args.ntrain, npoints = args.size, rescale = args.rescale)
 print('start meta causal')
 start = time.process_time()
 model = SMMwEnsemble({
-                        "CDS" : cdt.causality.pairwise.CDS(),
+                         "CDS" : cdt.causality.pairwise.CDS(),
                          "ANM" : cdt.causality.pairwise.ANM(), 
-                        # "ANM-CL" : base_methods.ANM_CL(), 
                          "IGCI" : base_methods.fIGCI(), 
-                         #"fRECI": base_methods.fRECI(),
-                        "RECI": cdt.causality.pairwise.RECI()},
+                         "RECI": base_methods.fRECI()},
                         include_constant=False,
+                        exp_weights=True,
                         param_grid = {"C": np.logspace(-2, 3, 20)},
                         gamma = args.gamma, 
                         parallel=args.parallel,
