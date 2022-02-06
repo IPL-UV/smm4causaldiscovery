@@ -5,7 +5,7 @@ import argparse
 from .util import save_csv
 from smmw_ensemble import SMMwEnsemble
 import numpy as np
-from base_methods import fIGCI
+from base_methods import fIGCI, fRECI
 
 
 '''
@@ -25,7 +25,7 @@ def run(mech='nn', ntrain=100, ntest=100, size=100, noise_coeff=0.4, gamma = 100
         "ANM" : cdt.causality.pairwise.ANM(), 
         "BivariateFit" : cdt.causality.pairwise.BivariateFit(), 
         "IGCI" : fIGCI(), 
-        "RECI": cdt.causality.pairwise.RECI()},
+        "RECI": fRECI()},
         include_constant=True,
         exp_weights=False,
         param_grid = {"C": np.logspace(-3, 5, 20)},
