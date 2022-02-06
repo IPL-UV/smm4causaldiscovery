@@ -22,7 +22,7 @@ if args.generated1:
     mechs = ('nn', 'polynomial', 'sigmoid_add', 'sigmoid_mix', 'gp_add', 'gp_mix')
     ntrains = (100,)
     ntests = (100,)
-    sizes = (50, 100, 250, 500)
+    sizes = (750, 1000)
     ncoeffs = (0.2, 0.4, 0.6)
     
     exp_set = product(mechs, ncoeffs, sizes, ntrains, ntests)
@@ -32,17 +32,18 @@ if args.generated1:
         os.makedirs(path, exist_ok=True)
         for i in range(nrep):
             res = generated_data.run(mech, ntrain, ntest, size, gamma, size, True) 
-            util.save_csv(res, os.path.join(path, f'rep{i}.csv'))
+            util.save_csv(res[0:-1], os.path.join(path, f'rep{i}.csv'))
+            util.save_csv2(res[-1], os.path.join(path, f'df_rep{i}.csv'))
 
 
 if args.generated2:
     gamma = 1
     nrep = 10
-    mechs = ('nn', 'polynomial', 'sigmoid_add', 'sigmoid_mix',)
+    mechs = ('nn', 'polynomial', 'sigmoid_add', 'sigmoid_mix', "gp_add", "gp_mix")
     ntrains = (100, 250, 500, 750, 1000)
     ntests = (1000,)
     sizes = (250,)
-    ncoeffs = (0.2, 0.4, 0.6)
+    ncoeffs = (0.4,)
     
     exp_set = product(mechs, ncoeffs, sizes, ntrains, ntests)
     for (mech, ncoeff, size, ntrain, ntest) in exp_set:
@@ -51,4 +52,5 @@ if args.generated2:
         os.makedirs(path, exist_ok=True)
         for i in range(nrep):
             res = generated_data.run(mech, ntrain, ntest, size, gamma, size, True) 
-            util.save_csv(res, os.path.join(path, f'rep{i}.csv'))
+            util.save_csv(res[0:-1], os.path.join(path, f'rep{i}.csv'))
+            util.save_csv2(res[-1], os.path.join(path, f'df_rep{i}.csv'))
