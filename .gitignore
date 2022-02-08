@@ -3,4 +3,4 @@ data/
 *.pdf
 __pycache__/
 *.Rhistory
-results
+results*

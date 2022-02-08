@@ -26,7 +26,7 @@ def run(mech='nn', ntrain=100, ntest=100, size=100, noise_coeff=0.4, gamma = 100
         "BivariateFit" : cdt.causality.pairwise.BivariateFit(), 
         "IGCI" : fIGCI(), 
         "RECI": fRECI()},
-        include_constant=True,
+        include_constant=False,
         exp_weights=False,
         param_grid = {"C": np.logspace(-3, 5, 20)},
         parallel=True,
