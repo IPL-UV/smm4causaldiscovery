@@ -11,7 +11,7 @@ from joblib import Parallel, delayed
 class SMMwEnsemble():
 
     def __init__(self, base_methods,
-            include_constant=True,
+            include_constant=False,
             gamma=1.0, 
             exp_weights=False,
             param_grid=None, 
