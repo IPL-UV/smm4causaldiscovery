@@ -1,10 +1,11 @@
 library("reshape2")
 library("ggplot2")
+library("ggridges")
 source("plot_util.R")
 
 mechs <- c("nn", "polynomial", "sigmoid_add", "sigmoid_mix", "gp_add", "gp_mix")
 sizes <- c(250)
-ntrains <- c(100, 500, 1000)
+ntrains <- c(1000)
 ncoefs <- c(0.4)
 ntests <- 1000
 gammas <- 1
@@ -12,9 +13,30 @@ gammas <- 1
 D <- load_dfs(mechs, ncoefs, sizes, ntrains, ntests, gammas, 
              dir = "results", exp = "generated_data", 10)
 
-pp <- ggplot(D) + geom_density(aes(x = value, color = as.factor(ntrain), group = as.factor(ntrain)), bw = 0.05) +
-  facet_grid(rows = vars(variable), cols = vars(mech)) + theme_bw() + ylab("") + 
-  coord_cartesian(ylim=c(0, 2), xlim=c(-2,2)) #+
-  #theme(axis.text.y = element_blank(), axis.ticks = element_blank()) + xlab("SMM decision function") 
+D <- D[!D$variable == "X_constant", ] 
 
- ggsave(pp, file = "images/plot_df.pdf")
+colors <- palette.colors(7, palette = "R4")
+names(colors) <- NULL
+
+cols = c(
+  "ANM" = colors[2],
+  "CDS" = colors[3],
+  "BivariateFit" = colors[4],
+  "IGCI" = colors[5],
+  "RECI" = colors[6]
+)
+pp <- ggplot(D, aes(x = value, y =variable,  fill = variable)) + 
+	stat_density_ridges(bandwidth = 0.1, alpha = 0.8) + 
+	facet_grid(cols = vars(mech)) + 
+	coord_cartesian(clip = "off") +
+	scale_y_discrete(expand = c(0.1, 0)) + 
+	scale_fill_manual(values = cols) + 
+	xlim(-2.2,2.2) + 
+	#scale_x_continuous(expand = c(0,0)) +
+	xlab("") + ylab("") + 
+	labs(fill = "method") + 
+	#theme_ridges() + 
+	theme_bw() + 
+	theme(legend.position = "none")
+
+ ggsave(pp, file = "images/plot_df.pdf", width = 6, height = 4)

@@ -7,7 +7,7 @@ dir.create("images", showWarnings = FALSE)
 mechs <- c("nn", "polynomial", "sigmoid_add", "sigmoid_mix", "gp_add", "gp_mix")
 sizes <- c(50, 100, 250, 500, 750, 1000)
 ntrains <- c(100)
-ncoefs <- c(0.2, 0.4, 0.6)
+ncoefs <- c(0.2, 0.4, 0.6, 1)
 ntests <- 100
 gammas <- 1
 
@@ -45,14 +45,14 @@ plot_acc1 <-
            y = value,
            col = alg,
            fill = alg
-         )) + geom_line() +
+         ))  + geom_line() + 
   #geom_ribbon(alpha = 0.4, linetype = 0) +
   facet_grid(rows = vars(ncoef), cols = vars(mech), scales = "free_y") +
   #ylim(0.5,1) + 
   scale_color_manual(values = cols) +
   scale_fill_manual(values = cols) +
-  theme_bw() + labs(color = "algorithms",
-                    fill = "algorithms",
+  theme_bw() + labs(color = "method",
+                    fill = "method",
                     y = "accuracy",
                     x = 'sample size') +
   theme(legend.position = "bottom",
@@ -65,7 +65,7 @@ plot_acc1 <-
 ggsave(
   filename = paste0("images/accuracy_generated_1.pdf"),
   plot = plot_acc1,
-  width = 5,
+  width = 6,
   height = 4
 )
 
@@ -86,8 +86,8 @@ plot_acc2 <- ggplot(
   facet_grid(rows = vars(ncoef), cols = vars(mech), scales = "free_y") +
   scale_color_manual(values = cols) +
   scale_fill_manual(values = cols) +
-  theme_bw() + labs(color = "algorithms",
-                    fill = "algorithms",
+  theme_bw() + labs(color = "method",
+                    fill = "method",
                     y = "accuracy",
                     x = 'sample size') +
   theme(legend.position = "bottom",
@@ -96,7 +96,7 @@ plot_acc2 <- ggplot(
 ggsave(
   filename = paste0("images/accuracy_generated_2.pdf"),
   plot = plot_acc2,
-  width = 5,
+  width = 6,
   height = 4
 )
 
@@ -116,8 +116,8 @@ plot_acc3 <- ggplot(
   scale_fill_manual(values = cols) +
   #geom_ribbon(alpha = 0.4, linetype = 0) +
   facet_grid(rows = vars(ncoef), cols = vars(mech), scales = "free_y") +
-  theme_bw() + labs(color = "algorithms",
-                    fill = "algorithms",
+  theme_bw() + labs(color = "method",
+                    fill = "method",
                     y = "accuracy",
                     x = 'sample size') +
   theme(legend.position = "bottom",
@@ -127,7 +127,7 @@ plot_acc3 <- ggplot(
 ggsave(
   filename = paste0("images/accuracy_generated_3.pdf"),
   plot = plot_acc3,
-  width = 5,
+  width = 6,
   height = 4
 )
 
@@ -148,12 +148,12 @@ plot_time <- ggplot(
   #geom_ribbon(alpha = 0.4, linetype = 0) +
   scale_y_log10() +
   scale_color_manual(values = cols) +
-  theme_bw() + labs(color = "algorithms",
-                                                    fill = "algorithms",
-                                                    y = "time (seconds)",
-                                                    x = 'training size') +
+  theme_bw() + labs(color = "method",
+		    fill = "method",
+		    y = "time (seconds)",
+		    x = 'sample size') +
   theme(legend.position = "bottom",
-        axis.text.x = element_text(angle = 30))
+	axis.text.x = element_text(angle = 30))
 
 ggsave(paste0("images/time_exp.pdf"),
        plot = plot_time)
@@ -185,20 +185,20 @@ plot_acc4 <-
            col = alg,
            fill = alg
          )) + geom_line() +
-  facet_grid(rows = vars(ncoef), cols = vars(mech), scales = "free_y") +
+  facet_grid(cols = vars(mech), scales = "free_y") +
   geom_ribbon(alpha = 0.4, linetype = 0) +
   #ylim(0,1) + 
   scale_color_manual(values = cols) +
   scale_fill_manual(values = cols) +
-  theme_bw() + labs(color = "algorithms",
-                    fill = "algorithms",
+  theme_bw() + labs(color = "method",
+                    fill = "method",
                     y = "accuracy",
                     x = 'training size') +
   theme(legend.position = "bottom",
         axis.text.x = element_text(angle = 30))
 
 ggsave(paste0("images/accuracy_generated_4.pdf"),
-       plot = plot_acc4)
+       plot = plot_acc4, width = 6, height=4)
 
 
 
@@ -218,13 +218,13 @@ plot_time <- ggplot(
   #geom_ribbon(alpha = 0.4, linetype = 0) +
   scale_y_log10() +
   scale_color_manual(values = cols) +
-  theme_bw() + labs(color = "algorithms",
-                    fill = "algorithms",
+  theme_bw() + labs(color = "method",
+                    fill = "method",
                     y = "time (seconds)",
                     x = 'training size') +
   theme(legend.position = "bottom",
         axis.text.x = element_text(angle = 30))
 
 ggsave(paste0("images/time_exp2.pdf"),
-       plot = plot_time)
+       plot = plot_time, width = 6, height = 4)
 
