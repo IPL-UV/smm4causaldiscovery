@@ -12,7 +12,7 @@ function to run experiment over tuebingen data set
 '''
 
 def run(mech = 'nn', ntrain=100,
-        ntest=100, size=100, noise_coeff=0.4,
+        size=100, noise_coeff=0.4,
         gamma = 100, rescale=True):
 
 

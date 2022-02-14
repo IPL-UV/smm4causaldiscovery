@@ -73,6 +73,6 @@ if args.tuebingen:
                 f'{mech}{ncoeff}_s{size}_ntrain{ntrain}_gamma{gamma}')
         os.makedirs(path, exist_ok=True)
         for i in range(nrep):
-            res = tuebingen.run(mech, ntrain, size, gamma, size, True) 
+            res = tuebingen.run(mech, ntrain, size, ncoef, gamma, True) 
             util.save_csv(res[0:-1], os.path.join(path, f'rep{i}.csv'))
             util.save_csv2(res[-1], os.path.join(path, f'df_rep{i}.csv'))
