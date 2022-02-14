@@ -1,4 +1,4 @@
-from experiments import generated_data 
+from experiments import generated_data, tuebingen 
 from experiments import util 
 from itertools import product
 import os
@@ -11,9 +11,12 @@ parser.add_argument('--generated1', action='store_true',
 parser.add_argument('--generated2', action='store_true',
                     help='run generated data experiment 2')
 
+parser.add_argument('--tuebingen', action='store_true',
+                    help='run experiment with tuebingen')
+
+
 args = parser.parse_args()
 print(args)
-
 
 
 if args.generated1:
@@ -22,8 +25,8 @@ if args.generated1:
     mechs = ('nn', 'polynomial', 'sigmoid_add', 'sigmoid_mix', 'gp_add', 'gp_mix')
     ntrains = (100,)
     ntests = (100,)
-    sizes = (750, 1000)
-    ncoeffs = (0.2, 0.4, 0.6)
+    sizes = (50, 100, 250, 500, 750, 1000)
+    ncoeffs = (0.2, 0.4, 0.6, 1.0)
     
     exp_set = product(mechs, ncoeffs, sizes, ntrains, ntests)
     for (mech, ncoeff, size, ntrain, ntest) in exp_set:
@@ -31,7 +34,7 @@ if args.generated1:
                 f'{mech}{ncoeff}_s{size}_ntrain{ntrain}_ntest{ntest}_gamma{gamma}')
         os.makedirs(path, exist_ok=True)
         for i in range(nrep):
-            res = generated_data.run(mech, ntrain, ntest, size, gamma, size, True) 
+            res = generated_data.run(mech, ntrain, ntest, size, ncoeff, gamma, True) 
             util.save_csv(res[0:-1], os.path.join(path, f'rep{i}.csv'))
             util.save_csv2(res[-1], os.path.join(path, f'df_rep{i}.csv'))
 
@@ -39,7 +42,7 @@ if args.generated1:
 if args.generated2:
     gamma = 1
     nrep = 10
-    mechs = ('nn', 'polynomial', 'sigmoid_add', 'sigmoid_mix', "gp_add", "gp_mix")
+    mechs = ('nn', 'polynomial', 'sigmoid_add', 'sigmoid_mix', 'gp_add', 'gp_mix')
     ntrains = (100, 250, 500, 750, 1000)
     ntests = (1000,)
     sizes = (250,)
@@ -51,6 +54,25 @@ if args.generated2:
                 f'{mech}{ncoeff}_s{size}_ntrain{ntrain}_ntest{ntest}_gamma{gamma}')
         os.makedirs(path, exist_ok=True)
         for i in range(nrep):
-            res = generated_data.run(mech, ntrain, ntest, size, gamma, size, True) 
+            res = generated_data.run(mech, ntrain, ntest, size, ncoeff, gamma, True) 
+            util.save_csv(res[0:-1], os.path.join(path, f'rep{i}.csv'))
+            util.save_csv2(res[-1], os.path.join(path, f'df_rep{i}.csv'))
+
+
+if args.tuebingen: 
+    gamma = 1
+    nrep = 10
+    mechs = ('nn')
+    ntrains = (100, 250, 500, 750, 1000)
+    sizes = (250,)
+    ncoeffs = (0.4,)
+    
+    exp_set = product(mechs, ncoeffs, sizes, ntrains)
+    for (mech, ncoeff, size, ntrain) in exp_set:
+        path = os.path.join('results', 'tuebingen', 
+                f'{mech}{ncoeff}_s{size}_ntrain{ntrain}_gamma{gamma}')
+        os.makedirs(path, exist_ok=True)
+        for i in range(nrep):
+            res = tuebingen.run(mech, ntrain, size, gamma, size, True) 
             util.save_csv(res[0:-1], os.path.join(path, f'rep{i}.csv'))
             util.save_csv2(res[-1], os.path.join(path, f'df_rep{i}.csv'))

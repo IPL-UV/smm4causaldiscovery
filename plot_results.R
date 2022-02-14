@@ -55,6 +55,7 @@ plot_acc1 <-
                     fill = "method",
                     y = "accuracy",
                     x = 'sample size') +
+  coord_cartesian(ylim = c(0.4,1)) + 
   theme(legend.position = "bottom",
         axis.text.x = element_text(angle = 30))
 
@@ -90,6 +91,7 @@ plot_acc2 <- ggplot(
                     fill = "method",
                     y = "accuracy",
                     x = 'sample size') +
+  coord_cartesian(ylim = c(0.25,1)) + 
   theme(legend.position = "bottom",
         axis.text.x = element_text(angle = 30))
 
@@ -120,6 +122,7 @@ plot_acc3 <- ggplot(
                     fill = "method",
                     y = "accuracy",
                     x = 'sample size') +
+  coord_cartesian(ylim = c(0.25,1)) + 
   theme(legend.position = "bottom",
         axis.text.x = element_text(angle = 30))
 
@@ -156,7 +159,7 @@ plot_time <- ggplot(
 	axis.text.x = element_text(angle = 30))
 
 ggsave(paste0("images/time_exp.pdf"),
-       plot = plot_time)
+       plot = plot_time, width = 6, height = 4)
 
 
 
