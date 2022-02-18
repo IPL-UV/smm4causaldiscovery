@@ -60,7 +60,7 @@ def load_anlsmn(name = 'AN', rescale=True):
     return X, y
 
 def load_sim(name = 'SIM', rescale=True): 
-    bp = path.join('data/ANLSMN_pairs/', name)
+    bp = path.join('data/SIM_pairs/', name)
     data = []
     for i in range(100):
         pair = pd.read_csv(path.join(bp, f'pair{i+1:04}.txt'))
