@@ -12,7 +12,8 @@ load_results <- function(mechs, ncoefs, sizes,
                             stringsAsFactors = FALSE)
   
   res <- lapply(1:nrow(exp_combin), function(i) {
-    basepath <- file.path(dir, exp, paste0(PRF, exp_combin[i,], collapse = "")) 
+    whc <- !is.na(exp_combin[i,])
+    basepath <- file.path(dir, exp, paste0(PRF[whc], exp_combin[i,whc], collapse = "")) 
     print(basepath)
     if (!dir.exists(basepath)) return(NA)
     files <- file.path(basepath, paste0("rep", 0:(nrep - 1), ".csv"))

@@ -16,6 +16,7 @@ class SMMwEnsemble():
             exp_weights=False,
             param_grid=None, 
             C=1.0,
+            size=None,
             parallel=True,
             njobs=cpu_count() - 1,
             verbose=False):
@@ -31,6 +32,7 @@ class SMMwEnsemble():
         self.gamma = gamma 
         self.C = C
         self.exp_weights = exp_weights
+        self.size = size
         self.param_grid = param_grid
         self.parallel = parallel
         self.njobs = njobs
@@ -39,7 +41,7 @@ class SMMwEnsemble():
         if self.include_constant:
             self.base_methods.update({"_constant": None})
         # data to jax array
-        jX = cdt_data_to_jax(X)
+        jX = cdt_data_to_jax(X, size=self.size)
         self.base_methods_classifiers = {} 
         self.base_scores = {} 
         self.smm_scores = {} 
@@ -110,7 +112,7 @@ class SMMwEnsemble():
 
 
     def predict(self, X):
-        jX = cdt_data_to_jax(X)
+        jX = cdt_data_to_jax(X, size=self.size)
         # compute test gram 
         start = time.time()
         xnew = kme_rbf(jX, self.Xtrain, self.gamma)

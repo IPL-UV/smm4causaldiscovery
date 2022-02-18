@@ -5,9 +5,9 @@ source("plot_util.R")
 
 mechs <- c("nn", "polynomial", "sigmoid_add", "sigmoid_mix", "gp_add", "gp_mix")
 sizes <- c(250)
-ntrains <- c(1000)
-ncoefs <- c(0.4)
-ntests <- 1000
+ntrains <- c(100)
+ncoefs <- c("0.2", "0.4", "0.6", "1.0")
+ntests <- 100
 gammas <- 1
 
 D <- load_dfs(mechs, ncoefs, sizes, ntrains, ntests, gammas, 

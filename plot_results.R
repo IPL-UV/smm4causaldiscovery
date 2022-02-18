@@ -2,21 +2,6 @@ library(ggplot2)
 library(colorblindr)
 source("plot_util.R")
 
-dir.create("images", showWarnings = FALSE)
-
-mechs <- c("nn", "polynomial", "sigmoid_add", "sigmoid_mix", "gp_add", "gp_mix")
-sizes <- c(50, 100, 250, 500, 750, 1000)
-ntrains <- c(100)
-ncoefs <- c(0.2, 0.4, 0.6, 1)
-ntests <- 100
-gammas <- 1
-
-data <- load_results(mechs, ncoefs, sizes, ntrains, ntests, gammas, 
-             dir = "results", exp = "generated_data", 10)
-
-D <- aggregate(value ~ mech + ncoef + size + ntrain + ntest + gamma + alg + variable,
-               data = data, FUN = mean )
-
 ## this should be colorblind-safe
 colors <- palette.colors(7, palette = "R4")
 names(colors) <- NULL
@@ -36,6 +21,23 @@ cols = c(
   "IGCI" = colors[5],
   "RECI" = colors[6]
 )
+
+dir.create("images", showWarnings = FALSE)
+
+mechs <- c("nn", "polynomial", "sigmoid_add", "sigmoid_mix", "gp_add", "gp_mix")
+sizes <- c(50, 100, 250, 500, 750, 1000)
+ntrains <- c(100)
+ncoefs <- c("0.2", "0.4", "0.6", "1.0")
+ntests <- 100
+gammas <- 1
+
+data <- load_results(mechs, ncoefs, sizes, ntrains, ntests, gammas, 
+             dir = "results", exp = "generated_data", 10)
+
+D <- aggregate(value ~ mech + ncoef + size + ntrain + ntest + gamma + alg + variable,
+               data = data, FUN = mean )
+
+
 
 plot_acc1 <-
   ggplot(D[D$alg %in% c("smm_ensemble", "avg", "vot", "best") & 
@@ -231,3 +233,51 @@ plot_time <- ggplot(
 ggsave(paste0("images/time_exp2.pdf"),
        plot = plot_time, width = 6, height = 4)
 
+################# tuebingen 
+
+
+mechs <- c("['nn', 'sigmoid_add', 'sigmoid_mix']")
+sizes <- c(250)
+ntrains <- c(100, 250, 500, 750, 1000)
+ncoefs <- c("0.4")
+ntests <- NA
+gammas <- 1
+
+data <- load_results(mechs, ncoefs, sizes, ntrains, ntests, gammas, 
+                     dir = "results", exp = "tuebingen", 4)
+
+D <- aggregate(value ~ mech + ncoef + size + ntrain + gamma + alg + variable,
+               data = data, FUN = function(x) c(mean = mean(x, na.rm = TRUE), 
+                                                sd = sd(x, na.rm = TRUE)) )
+D <- do.call(data.frame, D)
+
+plot_acc_tuebingen_1 <-
+  ggplot(D[D$alg %in% c("smm_ensemble", "rcc", "jarfo", "best") & 
+             D$variable == "acc", ],
+         aes(
+           x = ntrain,
+           y = value.mean,
+           ymin = value.mean - value.sd,
+           ymax = value.mean + value.sd,
+           col = alg,
+           fill = alg
+         )) + geom_line() +
+  #facet_grid(cols = vars(mech), scales = "free_y") +
+  geom_ribbon(alpha = 0.4, linetype = 0) +
+  #ylim(0,1) + 
+  scale_color_manual(values = cols) +
+  scale_fill_manual(values = cols) +
+  theme_bw() + labs(color = "method",
+                    fill = "method",
+                    y = "accuracy",
+                    x = 'training size') +
+  theme(legend.position = "bottom",
+        axis.text.x = element_text(angle = 30))
+
+# save plot
+ggsave(
+  filename = paste0("images/accuracy_tuebingen_1.pdf"),
+  plot = plot_acc_tuebingen_1,
+  width = 6,
+  height = 4
+)

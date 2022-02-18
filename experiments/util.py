@@ -2,6 +2,7 @@ import csv
 import pandas as pd
 import cdt 
 import numpy as np
+from os import path
 
 
 def save_csv2(data, path):
@@ -26,7 +27,7 @@ def save_csv(data, path):
 def load_data(pairs, target):
     X = cdt.utils.io.read_causal_pairs(args.pairs, scale=args.rescale)
     y = pd.read_csv(args.target).set_index('SampleID')
-    return X,y
+    return X, y
     
 def data_train_test(X, y, ntrain, ntest):
     Xtrain = X.iloc[0:ntrain, :]
@@ -35,3 +36,49 @@ def data_train_test(X, y, ntrain, ntest):
     ytrain = y.iloc[0:ntrain, :]
     ytest = y.iloc[ntrain:(ntrain+ntest), :]
     return Xtrain, ytrain, Xtest, ytest
+
+
+def load_anlsmn(name = 'AN', rescale=True): 
+    bp = path.join('data/ANLSMN_pairs/', name)
+    data = []
+    for i in range(100):
+        pair = pd.read_csv(path.join(bp, f'pair_{i+1}.txt'))
+        pair.columns = ['xx', 'A', 'B']
+        A = pair.A.to_numpy()
+        B = pair.B.to_numpy()
+        if rescale:
+            A = (A - np.mean(A)) / np.std(A)
+            B = (B - np.mean(B)) / np.std(B)
+        data.append((i+1, A, B))
+        
+    X = pd.DataFrame(data, columns=['SampleID', 'A', 'B']) 
+    X = X.set_index('SampleID')
+
+    y = pd.read_csv(path.join(bp, 'pairs_gt.txt'), header=None)
+    y[y==0] = -1
+
+    return X, y
+
+def load_sim(name = 'SIM', rescale=True): 
+    bp = path.join('data/ANLSMN_pairs/', name)
+    data = []
+    for i in range(100):
+        pair = pd.read_csv(path.join(bp, f'pair{i+1:04}.txt'))
+        pair.columns = ['A', 'B']
+        A = pair.A.to_numpy()
+        B = pair.B.to_numpy()
+        if rescale:
+            A = (A - np.mean(A)) / np.std(A)
+            B = (B - np.mean(B)) / np.std(B)
+        data.append((i+1, A, B))
+        
+    X = pd.DataFrame(data, columns=['SampleID', 'A', 'B']) 
+    X = X.set_index('SampleID')
+
+    tmp = pd.read_csv(path.join(bp, 'pairmeta.txt'), header=None)
+    tmp.columns = ['id', 'c1', 'c2', 'e1', 'e2', 'w']
+    
+    y = tmp.c1 
+    y[y==2] = -1
+
+    return X, y
