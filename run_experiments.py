@@ -1,4 +1,4 @@
-from experiments import generated_data, tuebingen 
+from experiments import generated_data, benchmarks 
 from experiments import util 
 from itertools import product
 import os
@@ -11,8 +11,9 @@ parser.add_argument('--generated1', action='store_true',
 parser.add_argument('--generated2', action='store_true',
                     help='run generated data experiment 2')
 
-parser.add_argument('--tuebingen', action='store_true',
-                    help='run experiment with tuebingen')
+parser.add_argument('--benchmarks', action='store_true',
+                    help='run experiment on benchmarks')
+
 
 
 args = parser.parse_args()
@@ -59,20 +60,17 @@ if args.generated2:
             util.save_csv2(res[-1], os.path.join(path, f'df_rep{i}.csv'))
 
 
-if args.tuebingen: 
+if args.benchmarks: 
     gamma = 1
     nrep = 10
-    mechs = ('nn')
-    ntrains = (100, 250, 500, 750, 1000)
+    ntrains = (20,)
     sizes = (250,)
-    ncoeffs = (0.4,)
     
-    exp_set = product(mechs, ncoeffs, sizes, ntrains)
-    for (mech, ncoeff, size, ntrain) in exp_set:
-        path = os.path.join('results', 'tuebingen', 
-                f'{mech}{ncoeff}_s{size}_ntrain{ntrain}_gamma{gamma}')
+    exp_set = product(sizes, ntrains)
+    for (size, ntrain) in exp_set:
+        path = os.path.join('results', 'benchmarks', 
+                f'mix_s{size}_ntrain{ntrain}_gamma{gamma}')
         os.makedirs(path, exist_ok=True)
         for i in range(nrep):
-            res = tuebingen.run(mech, ntrain, size, ncoef, gamma, True) 
-            util.save_csv(res[0:-1], os.path.join(path, f'rep{i}.csv'))
-            util.save_csv2(res[-1], os.path.join(path, f'df_rep{i}.csv'))
+            res = benchmarks.run(ntrain, size, gamma) 
+            util.save_csv2(res, os.path.join(path, f'rep{i}.csv'))

@@ -63,7 +63,7 @@ def load_sim(name = 'SIM', rescale=True):
     bp = path.join('data/SIM_pairs/', name)
     data = []
     for i in range(100):
-        pair = pd.read_csv(path.join(bp, f'pair{i+1:04}.txt'))
+        pair = pd.read_table(path.join(bp, f'pair{i+1:04}.txt'))
         pair.columns = ['A', 'B']
         A = pair.A.to_numpy()
         B = pair.B.to_numpy()
@@ -75,7 +75,7 @@ def load_sim(name = 'SIM', rescale=True):
     X = pd.DataFrame(data, columns=['SampleID', 'A', 'B']) 
     X = X.set_index('SampleID')
 
-    tmp = pd.read_csv(path.join(bp, 'pairmeta.txt'), header=None)
+    tmp = pd.read_table(path.join(bp, 'pairmeta.txt'), header=None)
     tmp.columns = ['id', 'c1', 'c2', 'e1', 'e2', 'w']
     
     y = tmp.c1 
