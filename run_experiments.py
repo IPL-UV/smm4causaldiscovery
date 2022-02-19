@@ -48,7 +48,7 @@ if args.mixgenerated:
     nrep = 10
     ntrains = (5, 10, 20, )
     ntest = 1000
-    sizes = 250
+    size = 250
     mechs = ('linear', 'nn', 'polynomial', 'sigmoid_add', 'sigmoid_mix', 'gp_add', 'gp_mix')
     noises = ('normal', 'uniform')
     ncoeffs = (0.1, 0.2, 0.4, 0.6, 0.8, 1)
