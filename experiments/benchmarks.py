@@ -20,20 +20,20 @@ benchmarks = { 'ANLSMN' : {'load' : load_anlsmn, 'names' : anlsmn},
         'tuebingen': {'load': load_dataset , 'names': ('tuebingen',) }}
 
 
-MECHS = ('nn', 'sigmoid_mix', 'sigmoid_add', 'polynomial', 'gp_add', 'gp_mix', 'linear')
-NCOEFFS = (0.1, 0.4, 0.8)
-
-def run(ntrain=100, size=100, gamma = 1):
+def run(mechs=('nn',), noises=('normal',),
+        ncoeffs=(0.1,),
+        ntrain=10, size=100, gamma = 1):
 
 
     gen=cdt.data.CausalPairGenerator('linear', noise_coeff=0.4)
     X, y = gen.generate(1, npoints=size, rescale=True)
-    for mech in MECHS:
-        for ncoeff in NCOEFFS:
-            gen=cdt.data.CausalPairGenerator(mech, noise_coeff=ncoeff)
-            X1, y1 = gen.generate(ntrain, npoints=size, rescale=True)
-            X=X.append(X1)
-            y=y.append(y1)
+    for mech in mechs:
+        for noise in noises:
+            for ncoeff in ncoeffs:
+                gen=cdt.data.CausalPairGenerator(mech, noise_coeff=ncoeff)
+                X1, y1 = gen.generate(ntrain, npoints=size, rescale=True)
+                X=X.append(X1)
+                y=y.append(y1)
     
     train_time = {} 
     print('start meta causal')
@@ -85,7 +85,10 @@ def run(ntrain=100, size=100, gamma = 1):
 
             # smm
             start = time.time()
+            if name == 'tuebingen':
+                model.parallel=False
             smm_score = model.score(Xt,yt) 
+            model.parallel = True
             end = time.time() 
             test_time['smm_ensemble'] = end - start
 
