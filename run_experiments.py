@@ -67,11 +67,12 @@ if args.mixgenerated:
 if args.benchmarks: 
     gamma = 1
     nrep = 10
-    ntrains = (5, 10) ## effective training size is 7*2*6*ntrain 
+    ## effective training size is ntrain * |mechs|*|noises|*|ncoeffs| 
+    ntrains = (50, 100) 
     sizes = (250,)
     mechs = ('linear', 'nn', 'polynomial', 'sigmoid_add', 'sigmoid_mix', 'gp_add', 'gp_mix')
-    noises = ('normal', 'uniform')
-    ncoeffs = (0.1, 0.2, 0.4, 0.6, 0.8, 1)
+    noises = ('normal2', 'uniform2')
+    ncoeffs = (1,)
     
     exp_set = product(sizes, ntrains)
     for (size, ntrain) in exp_set:

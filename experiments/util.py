@@ -13,8 +13,16 @@ def normal(points):
 def uniform(points):
     return rng.uniform(0,1,(points,1)) 
 
+def normal2(points):
+    sigma = rng.uniform(0,1,1)
+    return sigma*rng.standard_normal((points,1))
 
-noise_funcs = {'normal': normal, 'uniform': uniform }
+def uniform2(points):
+    sigma = rng.uniform(0,1,1)
+    return sigma*rng.uniform(0,1,(points,1)) 
+
+noise_funcs = {'normal': normal, 'uniform': uniform,
+               'normal2': normal2, 'uniform2': uniform2}
 
 def save_csv2(data, path):
     pd.DataFrame.from_dict(data).to_csv(path)
