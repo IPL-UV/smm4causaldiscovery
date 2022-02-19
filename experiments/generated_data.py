@@ -6,6 +6,7 @@ from .util import save_csv
 from smmw_ensemble import SMMwEnsemble
 import numpy as np
 from base_methods import fIGCI, fRECI
+import os
 
 
 '''
