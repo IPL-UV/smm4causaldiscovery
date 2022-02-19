@@ -4,6 +4,17 @@ import cdt
 import numpy as np
 from os import path
 
+rng = np.random.default_rng(2022)
+
+def normal(points):
+    """Init a noise variable."""
+    return rng.standard_normal((points,1))
+
+def uniform(points):
+    return rng.uniform(0,1,(points,1)) 
+
+
+noise_funcs = {'normal': normal, 'uniform': uniform }
 
 def save_csv2(data, path):
     pd.DataFrame.from_dict(data).to_csv(path)

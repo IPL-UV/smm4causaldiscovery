@@ -6,7 +6,7 @@ from smmw_ensemble import SMMwEnsemble
 import numpy as np
 from base_methods import fIGCI, fRECI
 from cdt.data import load_dataset
-from .util import load_anlsmn, load_sim
+from .util import load_anlsmn, load_sim, noise_funcs
 
 '''
 function to run experiment over benchmarks data sets
@@ -19,7 +19,6 @@ benchmarks = { 'ANLSMN' : {'load' : load_anlsmn, 'names' : anlsmn},
         'SIM': {'load' : load_sim, 'names' : sim},
         'tuebingen': {'load': load_dataset , 'names': ('tuebingen',) }}
 
-
 def run(mechs=('nn',), noises=('normal',),
         ncoeffs=(0.1,),
         ntrain=10, size=100, gamma = 1):
@@ -30,7 +29,8 @@ def run(mechs=('nn',), noises=('normal',),
     for mech in mechs:
         for noise in noises:
             for ncoeff in ncoeffs:
-                gen=cdt.data.CausalPairGenerator(mech, noise_coeff=ncoeff)
+                gen=cdt.data.CausalPairGenerator(mech, noise = noise_funcs[noise], 
+                                                 noise_coeff=ncoeff)
                 X1, y1 = gen.generate(ntrain, npoints=size, rescale=True)
                 X=X.append(X1)
                 y=y.append(y1)

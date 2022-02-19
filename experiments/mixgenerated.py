@@ -6,6 +6,7 @@ from .util import save_csv, save_csv2
 from smmw_ensemble import SMMwEnsemble
 import numpy as np
 from base_methods import fIGCI, fRECI
+from .util import noise_funcs
 
 
 '''
@@ -23,7 +24,7 @@ def run(rep, mechs = ('nn',), noises = ('normal', 'uniform'),
     for mech in mechs:
         for noise in noises:
             for ncoeff in ncoeffs:
-                gen=cdt.data.CausalPairGenerator(mech, noise=noise,
+                gen=cdt.data.CausalPairGenerator(mech, noise=noise_funcs[noise],
                                                  noise_coeff=ncoeff)
                 X1, y1 = gen.generate(ntrain, npoints=size, rescale=True)
                 X=X.append(X1)
@@ -76,7 +77,8 @@ def run(rep, mechs = ('nn',), noises = ('normal', 'uniform'),
                        f'{mech}_{noise}{ncoeff}_s{size}_ntrain{ntrain}_ntest{ntest}_gamma{gamma}')
                 os.makedirs(path, exist_ok=True)
 
-                gen=cdt.data.CausalPairGenerator(mech, noise=noise, noise_coeff=ncoeff)
+                gen=cdt.data.CausalPairGenerator(mech, noise=noise_funcs[noise],
+                                                 noise_coeff=ncoeff)
                 Xt, yt = gen.generate(ntest, npoints=size, rescale=rescale)
   
                 test_time = {}
