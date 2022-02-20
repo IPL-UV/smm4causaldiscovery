@@ -64,7 +64,7 @@ if args.mixgenerated:
 if args.benchmarks: 
     nrep = 10
     ## effective training size is ntrain * |mechs|*|noises|*|ncoeffs| 
-    ntrains = (100,) 
+    ntrains = (10,) 
     sizes = (250,)
     mechs = ('nn', 'polynomial', 'sigmoid_add', 'sigmoid_mix', 'gp_add', 'gp_mix')
     noises = ('normal2', 'uniform2')
