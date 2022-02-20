@@ -16,12 +16,12 @@ anlsmn=('AN', 'AN-s', 'LS', 'LS-s', 'MN-U')
 sim = ('SIM', 'SIM-c', 'SIM-G', 'SIM-ln') 
 
 benchmarks = { 'ANLSMN' : {'load' : load_anlsmn, 'names' : anlsmn},
-        'SIM': {'load' : load_sim, 'names' : sim},
-        'tuebingen': {'load': load_dataset , 'names': ('tuebingen',) }}
+        'SIM': {'load' : load_sim, 'names' : sim}}
+        #'tuebingen': {'load': load_dataset , 'names': ('tuebingen',) }}
 
 def run(mechs=('nn',), noises=('normal',),
         ncoeffs=(0.1,),
-        ntrain=10, size=100, gamma = 1):
+        ntrain=10, size=100):
 
 
     gen=cdt.data.CausalPairGenerator('linear', noise_coeff=0.4)
@@ -47,10 +47,9 @@ def run(mechs=('nn',), noises=('normal',),
         include_constant=False,
         exp_weights=False,
         param_grid = {"C": np.logspace(-3, 5, 20)},
-        size = 250,
-        parallel=True,
+        parallel=False,
         verbose=True,
-        gamma=gamma)
+        gamma='median')
     
     model.fit(X, y) 
     end = time.time() 

@@ -13,7 +13,7 @@ import os
 function to run experiment over generated data
 '''
 
-def run(mech='nn', ntrain=100, ntest=100, size=100, noise_coeff=0.4, gamma = 100, rescale=True):
+def run(mech='nn', ntrain=100, ntest=100, size=100, noise_coeff=0.4, rescale=True):
 
     gen = cdt.data.CausalPairGenerator(mech, noise_coeff=noise_coeff)
     X, y = gen.generate(ntrain, npoints=size, rescale=rescale)
@@ -30,10 +30,10 @@ def run(mech='nn', ntrain=100, ntest=100, size=100, noise_coeff=0.4, gamma = 100
         include_constant=False,
         exp_weights=False,
         param_grid = {"C": np.logspace(-3, 5, 20)},
-        parallel=True,
+        parallel=False,
         njobs=5,
         verbose=True,
-        gamma=gamma)
+        gamma='median')
     
     model.fit(X, y) 
     end = time.time() 

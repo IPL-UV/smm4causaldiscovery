@@ -17,7 +17,7 @@ function to run experiment over generated data
 
 def run(rep, mechs = ('nn',), noises = ('normal', 'uniform'),
         ncoeffs = (0.1,),   
-        ntrain=10, ntest=1000, size=100, gamma = 1, rescale=True):
+        ntrain=10, ntest=1000, size=100, rescale=True):
 
     gen=cdt.data.CausalPairGenerator('linear')
     X, y = gen.generate(1, npoints=size, rescale=True)
@@ -45,7 +45,7 @@ def run(rep, mechs = ('nn',), noises = ('normal', 'uniform'),
         parallel=True,
         njobs=5,
         verbose=True,
-        gamma=gamma)
+        gamma='median')
     
     model.fit(X, y) 
     end = time.time() 

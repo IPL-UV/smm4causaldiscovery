@@ -4,7 +4,7 @@ from sklearn.model_selection import GridSearchCV
 import numpy as np
 import time
 from .util import cdt_data_to_jax
-from .kernels import kme_rbf 
+from .kernels import kme_rbf, kme_rbf_median 
 from os import cpu_count
 from joblib import Parallel, delayed
 
@@ -12,7 +12,7 @@ class SMMwEnsemble():
 
     def __init__(self, base_methods,
             include_constant=False,
-            gamma=1.0, 
+            gamma="median", 
             exp_weights=False,
             param_grid=None, 
             C=1.0,
@@ -36,6 +36,10 @@ class SMMwEnsemble():
         self.param_grid = param_grid
         self.parallel = parallel
         self.njobs = njobs
+        if gamma=="median":
+            self.kernel=lambda p,q: kme_rbf_median(p,q)
+        else:
+            self.kernel=lambda p,q: kme_rbf(p,q,gamma)
 
     def fit(self, X, y):
         if self.include_constant:
@@ -52,7 +56,7 @@ class SMMwEnsemble():
 
         # compute gram matrix 
         start = time.time()
-        gram = kme_rbf(jX, jX, self.gamma)
+        gram = self.kernel(jX, jX)
         end = time.time()
 
         if self.verbose:
@@ -66,6 +70,8 @@ class SMMwEnsemble():
         else:
             base_preds = (_predict_base(nm, cl, X) for nm, cl in self.base_methods.items())
 
+        if self.verbose:
+            print("base training predictions done")
         # train base classifiers 
         for nmpred in base_preds:
             nm = nmpred[0]
@@ -115,7 +121,7 @@ class SMMwEnsemble():
         jX = cdt_data_to_jax(X, size=self.size)
         # compute test gram 
         start = time.time()
-        xnew = kme_rbf(jX, self.Xtrain, self.gamma)
+        xnew = self.kernel(jX, self.Xtrain)
         end = time.time()
         if self.verbose:
             print(f'test gram computed in {end - start} seconds')

@@ -41,7 +41,8 @@ print(args)
 gen = cdt.data.CausalPairGenerator(args.mech)
 X, y = gen.generate(args.ntrain, npoints = args.size, rescale = args.rescale)
 
-
+if args.gamma<0:
+    args.gamma="median"
 print('start meta causal')
 start = time.process_time()
 model = SMMwEnsemble({
