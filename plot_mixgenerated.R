@@ -1,0 +1,93 @@
+library(ggplot2)
+library(colorblindr)
+source("plot_util.R")
+
+## this should be colorblind-safe
+colors <- palette.colors(7, palette = "R4")
+names(colors) <- NULL
+
+cols = c(
+  "smm_ensemble" = colors[1],
+  "avg" = colors[2],
+  "vot" = colors[3],
+  "best" = colors[4],
+  ####
+  "rcc" = colors[2],
+  "jarfo" = colors[3],
+  ####
+  "ANM" = colors[2],
+  "CDS" = colors[3],
+  "BivariateFit" = colors[4],
+  "IGCI" = colors[5],
+  "RECI" = colors[6]
+)
+
+dir.create("images", showWarnings = FALSE)
+
+mechs <- c("nn", "polynomial", "sigmoid_add", "sigmoid_mix", "gp_add", "gp_mix")
+noises <- c("normal2")
+sizes <- c(250)
+ntrains <- c(5,10)
+ncoefs <- c(0.5)
+ntests <- 1000
+
+data <- load_results(mechs, noises,  ncoefs, sizes, ntrains, ntests, 
+                     dir = "results", exp = "generated_data_mix", 10)
+
+D <- aggregate(value ~ mech + noise + ncoef + size + ntrain + ntest + alg + variable,
+               data = data, FUN = function(x) c(mean = mean(x, na.rm = TRUE), sd = sd(x, na.rm = TRUE)) )
+D <- na.omit(do.call(data.frame, D))
+
+plot_acc4 <-
+  ggplot(D[D$alg %in% c("smm_ensemble", "rcc", "jarfo", "best") & 
+             D$variable == "acc", ],
+         aes(
+           x = ntrain,
+           y = value.mean,
+           ymin = value.mean - value.sd,
+           ymax = value.mean + value.sd,
+           col = alg,
+           fill = alg
+         )) + geom_line() +
+  facet_grid(cols = vars(mech), scales = "free_y") +
+  geom_ribbon(alpha = 0.4, linetype = 0) +
+  #ylim(0,1) + 
+  scale_color_manual(values = cols) +
+  scale_fill_manual(values = cols) +
+  theme_bw() + labs(color = "method",
+                    fill = "method",
+                    y = "accuracy",
+                    x = 'training size') +
+  theme(legend.position = "bottom",
+        axis.text.x = element_text(angle = 30))
+
+ggsave(paste0("images/accuracy_generated_4.pdf"),
+       plot = plot_acc4, width = 6, height=4)
+
+
+
+DD <- aggregate(value ~ alg + ntrain + variable, data = data, FUN = mean)
+
+plot_time <- ggplot(
+  DD[DD$variable %in% c("t.train", "t.test"), ],
+  aes(
+    x = ntrain,
+    y = value,
+    group = alg,
+    col = alg,
+    fill = alg
+  )
+) + geom_line(size = 1) +
+  facet_grid(cols = vars(variable), scales = "free_y") +
+  #geom_ribbon(alpha = 0.4, linetype = 0) +
+  scale_y_log10() +
+  scale_color_manual(values = cols) +
+  theme_bw() + labs(color = "method",
+                    fill = "method",
+                    y = "time (seconds)",
+                    x = 'training size') +
+  theme(legend.position = "bottom",
+        axis.text.x = element_text(angle = 30))
+
+ggsave(paste0("images/time_exp2.pdf"),
+       plot = plot_time, width = 6, height = 4)

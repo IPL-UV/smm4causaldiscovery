@@ -3,17 +3,19 @@ library("ggplot2")
 library("ggridges")
 source("plot_util.R")
 
-mechs <- c("nn", "polynomial", "sigmoid_add", "sigmoid_mix", "gp_add", "gp_mix")
+mechs <- c("linear", "nn", "polynomial", "sigmoid_add", 
+           "sigmoid_mix", "gp_add", "gp_mix")
 sizes <- c(250)
-ntrains <- c(100)
-ncoefs <- c("0.2", "0.4", "0.6", "1.0")
-ntests <- 100
-gammas <- 1
+ntrains <- c(5)
+noises <- c("normal2")
+ncoefs <- c("0.5")
+ntests <- 1000
+gammas <- NA
 
-D <- load_dfs(mechs, ncoefs, sizes, ntrains, ntests, gammas, 
-             dir = "results", exp = "generated_data", 10)
+D <- load_dfs(mechs, noises, ncoefs, sizes, ntrains, ntests,
+             dir = "results", exp = "generated_data_mix", 10)
 
-D <- D[!D$variable == "X_constant", ] 
+D <- na.omit(D[!D$variable == "X_constant", ])
 
 colors <- palette.colors(7, palette = "R4")
 names(colors) <- NULL
