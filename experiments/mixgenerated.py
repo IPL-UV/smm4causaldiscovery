@@ -46,7 +46,7 @@ def run(rep, mechs = ('nn',), noises = ('normal', 'uniform'),
         parallel=True,
         njobs=5,
         verbose=True,
-        gamma='median')
+        gamma=0.5)
     
     model.fit(X, y) 
     end = time.time() 
@@ -75,7 +75,7 @@ def run(rep, mechs = ('nn',), noises = ('normal', 'uniform'),
         for noise in noises:
             for ncoeff in ncoeffs:
                 path = os.path.join('results', 'generated_data_mix', 
-                       f'{mech}_{noise}{ncoeff}_s{size}_ntrain{ntrain}_ntest{ntest}_gamma{gamma}')
+                       f'{mech}{noise}{ncoeff}_s{size}_ntrain{ntrain}_ntest{ntest}')
                 os.makedirs(path, exist_ok=True)
 
                 gen=cdt.data.CausalPairGenerator(mech, noise=noise_funcs[noise],
@@ -112,5 +112,5 @@ def run(rep, mechs = ('nn',), noises = ('normal', 'uniform'),
                 scores.update(model.score_alternatives(yt))
                 # add scores of base methods
                 scores.update(model.score_base(yt))
-                util.save_csv((scores, train_time, test_time), os.path.join(path, f'rep{rep}.csv'))
-                util.save_csv2(model.smms_df, os.path.join(path, f'df_rep{rep}.csv'))
+                save_csv((scores, train_time, test_time), os.path.join(path, f'rep{rep}.csv'))
+                save_csv2(model.smms_df, os.path.join(path, f'df_rep{rep}.csv'))
