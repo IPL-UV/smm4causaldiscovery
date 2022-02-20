@@ -28,13 +28,13 @@ mechs <- c("nn", "polynomial", "sigmoid_add", "sigmoid_mix", "gp_add", "gp_mix")
 noises <- c("normal2", "uniform2")
 sizes <- c(50, 100, 250, 500, 750, 1000)
 ntrains <- c(100)
-ncoefs <- c("0.2", "0.5")
+ncoefs <- c("0.5")
 ntests <- 100
 
 data <- load_results(mechs, noises, ncoefs, sizes, ntrains, ntests,  
              dir = "results", exp = "generated_data", 10)
 
-D <- aggregate(value ~ mech + ncoef + size + ntrain + ntest + alg + variable,
+D <- aggregate(value ~ mech + ncoef + size + ntrain + ntest + alg + variable + noise,
                data = data, FUN = mean )
 
 
@@ -49,7 +49,7 @@ plot_acc1 <-
            fill = alg
          ))  + geom_line() + 
   #geom_ribbon(alpha = 0.4, linetype = 0) +
-  facet_grid(rows = vars(ncoef), cols = vars(mech), scales = "free_y") +
+  facet_grid(rows = vars(noise), cols = vars(mech), scales = "free_y") +
   #ylim(0.5,1) + 
   scale_color_manual(values = cols) +
   scale_fill_manual(values = cols) +
@@ -86,7 +86,7 @@ plot_acc2 <- ggplot(
 ) + geom_line() +
   #ylim(0.5,1) + 
   #geom_ribbon(alpha = 0.4, linetype = 0) +
-  facet_grid(rows = vars(ncoef), cols = vars(mech), scales = "free_y") +
+  facet_grid(rows = vars(noise), cols = vars(mech), scales = "free_y") +
   scale_color_manual(values = cols) +
   scale_fill_manual(values = cols) +
   theme_bw() + labs(color = "method",
@@ -119,7 +119,7 @@ plot_acc3 <- ggplot(
   scale_color_manual(values = cols) +
   scale_fill_manual(values = cols) +
   #geom_ribbon(alpha = 0.4, linetype = 0) +
-  facet_grid(rows = vars(ncoef), cols = vars(mech), scales = "free_y") +
+  facet_grid(rows = vars(noise), cols = vars(mech), scales = "free_y") +
   theme_bw() + labs(color = "method",
                     fill = "method",
                     y = "accuracy",
