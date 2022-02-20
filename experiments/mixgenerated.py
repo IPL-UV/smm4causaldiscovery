@@ -7,6 +7,7 @@ from smmw_ensemble import SMMwEnsemble
 import numpy as np
 from base_methods import fIGCI, fRECI
 from .util import noise_funcs
+import os
 
 
 '''
