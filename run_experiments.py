@@ -30,7 +30,7 @@ if args.generated1:
     ntests = (100,)
     sizes = (50, 100, 250, 500, 750, 1000)
     noises = ('normal2', 'uniform2')
-    ncoeffs = (0.2, 0.4, 0.6, 1.0)
+    ncoeffs = (0.5,)
     
     exp_set = product(mechs, noises, ncoeffs, sizes, ntrains, ntests)
     for (mech, noise, ncoeff, size, ntrain, ntest) in exp_set:

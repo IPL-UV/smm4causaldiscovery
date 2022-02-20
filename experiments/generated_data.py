@@ -31,10 +31,10 @@ def run(mech='nn', noise='normal2', ncoeff=0.5, ntrain=100, ntest=100, size=100,
         include_constant=False,
         exp_weights=False,
         param_grid = {"C": np.logspace(-3, 5, 20)},
-        parallel=False,
+        parallel=True,
         njobs=5,
         verbose=True,
-        gamma='median')
+        gamma=0.5)
     
     model.fit(X, y) 
     end = time.time() 
