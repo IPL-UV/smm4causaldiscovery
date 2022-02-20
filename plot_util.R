@@ -1,14 +1,15 @@
 library("reshape2")
 RN <- c("acc", "t.train", "t.test")
-PRF <- c("", "", "_s", "_ntrain", "_ntest")
+PRF <- c("", "", "", "_s", "_ntrain", "_ntest")
 
-load_results <- function(mechs, ncoefs, sizes, 
-                         ntrains, ntests, gammas, dir = "results", 
+load_results <- function(mechs, noises, ncoefs, sizes, 
+                         ntrains, ntests, dir = "results", 
                          exp = "generated_data", nrep = 10){
   
-  exp_combin <- expand.grid(mech = mechs, ncoef = ncoefs, 
+  exp_combin <- expand.grid(mech = mechs, noise = noises,
+			    ncoef = ncoefs, 
                             size = sizes, ntrain = ntrains, 
-                            ntest = ntests, gamma = gammas, 
+                            ntest = ntests, 
                             stringsAsFactors = FALSE)
   
   res <- lapply(1:nrow(exp_combin), function(i) {
@@ -28,11 +29,11 @@ load_results <- function(mechs, ncoefs, sizes,
 }
 
 
-load_dfs <- function(mechs, ncoefs, sizes, 
+load_dfs <- function(mechs,noises, ncoefs, sizes, 
                          ntrains, ntests, dir = "results", 
                          exp = "generated_data", nrep = 10){
   
-  exp_combin <- expand.grid(mech = mechs, ncoef = ncoefs, 
+  exp_combin <- expand.grid(mech = mechs,noise=noises,ncoef = ncoefs, 
                             size = sizes, ntrain = ntrains, 
                             ntest = ntests, 
                             stringsAsFactors = FALSE)
