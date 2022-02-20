@@ -7,15 +7,16 @@ from smmw_ensemble import SMMwEnsemble
 import numpy as np
 from base_methods import fIGCI, fRECI
 import os
+from .util import noise_funcs
 
 
 '''
 function to run experiment over generated data
 '''
 
-def run(mech='nn', ntrain=100, ntest=100, size=100, noise_coeff=0.4, rescale=True):
+def run(mech='nn', noise='normal2', ncoeff=0.5, ntrain=100, ntest=100, size=100, rescale=True):
 
-    gen = cdt.data.CausalPairGenerator(mech, noise_coeff=noise_coeff)
+    gen = cdt.data.CausalPairGenerator(mech, noise=noise_funcs[noise], noise_coeff=ncoeff)
     X, y = gen.generate(ntrain, npoints=size, rescale=rescale)
     
     train_time = {} 
