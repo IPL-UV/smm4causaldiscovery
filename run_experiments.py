@@ -29,15 +29,22 @@ if args.generated1:
     ntrains = (100,)
     ntests = (100,)
     sizes = (50, 100, 250, 500, 750, 1000)
+    noises = ('normal2', 'uniform2')
     ncoeffs = (0.2, 0.4, 0.6, 1.0)
     
-    exp_set = product(mechs, ncoeffs, sizes, ntrains, ntests)
-    for (mech, ncoeff, size, ntrain, ntest) in exp_set:
+    exp_set = product(mechs, noises, ncoeffs, sizes, ntrains, ntests)
+    for (mech, noise, ncoeff, size, ntrain, ntest) in exp_set:
         path = os.path.join('results', 'generated_data', 
-                f'{mech}{ncoeff}_s{size}_ntrain{ntrain}_ntest{ntest}')
+                f'{mech}{noise}{ncoeff}_s{size}_ntrain{ntrain}_ntest{ntest}')
         os.makedirs(path, exist_ok=True)
         for i in range(nrep):
-            res = generated_data.run(mech, ntrain, ntest, size, ncoeff, True) 
+            res = generated_data.run(mech=mech,
+                                     noise=noise,
+                                     ncoeff=ncoeff,
+                                     ntrain=ntrain,
+                                     ntest=ntest,
+                                     size=size,
+                                     rescale=True) 
             util.save_csv(res[0:-1], os.path.join(path, f'rep{i}.csv'))
             util.save_csv2(res[-1], os.path.join(path, f'df_rep{i}.csv'))
 
