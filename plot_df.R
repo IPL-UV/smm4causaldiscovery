@@ -6,7 +6,7 @@ source("plot_util.R")
 mechs <- c("linear", "nn", "polynomial", "sigmoid_add", 
            "sigmoid_mix", "gp_add", "gp_mix")
 sizes <- c(250)
-ntrains <- c(5)
+ntrains <- c(500, 750, 1000)
 noises <- c("normal2")
 ncoefs <- c("0.5")
 ntests <- 1000
@@ -28,7 +28,7 @@ cols = c(
   "RECI" = colors[6]
 )
 pp <- ggplot(D, aes(x = value, y =variable,  fill = variable)) + 
-	stat_density_ridges(bandwidth = 0.1, alpha = 0.8) + 
+	stat_density_ridges(bandwidth = 0.05, alpha = 0.8) + 
 	facet_grid(cols = vars(mech)) + 
 	coord_cartesian(clip = "off") +
 	scale_y_discrete(expand = c(0.1, 0)) + 
@@ -41,4 +41,4 @@ pp <- ggplot(D, aes(x = value, y =variable,  fill = variable)) +
 	theme_bw() + 
 	theme(legend.position = "none")
 
- ggsave(pp, file = "images/plot_df.pdf", width = 6, height = 4)
+ ggsave(pp, file = "images/plot_df.pdf", width = 3, height = 2.5)

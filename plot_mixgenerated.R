@@ -7,7 +7,7 @@ colors <- palette.colors(7, palette = "R4")
 names(colors) <- NULL
 
 cols = c(
-  "smm_ensemble" = colors[1],
+  "SMMwE" = colors[1],
   "avg" = colors[2],
   "vot" = colors[3],
   "best" = colors[4],
@@ -24,49 +24,84 @@ cols = c(
 
 dir.create("images", showWarnings = FALSE)
 
-mechs <- c("nn", "polynomial", "sigmoid_add", "sigmoid_mix", "gp_add", "gp_mix")
+mechs <- c("sigmoid_add", "sigmoid_mix", "gp_add", "gp_mix")
 noises <- c("normal2")
 sizes <- c(250)
-ntrains <- c(5,10)
+ntrains <- c(50, 100, 250, 500, 750, 1000)
 ncoefs <- c(0.5)
 ntests <- 1000
 
 data <- load_results(mechs, noises,  ncoefs, sizes, ntrains, ntests, 
-                     dir = "results", exp = "generated_data_mix", 10)
+                     dir = "results", exp = "generated_data_mix", 5)
 
+zalpha <- qnorm(0.975) # for 0.95 CI
 D <- aggregate(value ~ mech + noise + ncoef + size + ntrain + ntest + alg + variable,
                data = data, FUN = function(x) c(mean = mean(x, na.rm = TRUE), sd = sd(x, na.rm = TRUE)) )
 D <- na.omit(do.call(data.frame, D))
 
-plot_acc4 <-
-  ggplot(D[D$alg %in% c("smm_ensemble", "rcc", "jarfo", "best") & 
-             D$variable == "acc", ],
+D$alg[D$alg == "smm_ensemble"] <- "SMMwE"
+selected <- c("SMMwE", "rcc", "jarfo", "best")
+#selected <- c("smm_ensemble", "ANM", "CDS", "BivariateFit", "IGCI", "RECI")
+plot_acc4_sigmoid <-
+  ggplot(D[D$alg %in% selected & D$variable == "acc" & 
+             D$mech %in% c("sigmoid_add", "sigmoid_mix"), ],
          aes(
            x = ntrain,
            y = value.mean,
-           ymin = value.mean - value.sd,
-           ymax = value.mean + value.sd,
+           ymin = value.mean - zalpha*value.sd/sqrt(5),
+           ymax = value.mean + zalpha*value.sd/sqrt(5),
            col = alg,
            fill = alg
          )) + geom_line() +
   facet_grid(cols = vars(mech), scales = "free_y") +
   geom_ribbon(alpha = 0.4, linetype = 0) +
   #ylim(0,1) + 
-  scale_color_manual(values = cols) +
-  scale_fill_manual(values = cols) +
+  scale_color_manual(values = cols[selected]) +
+  scale_fill_manual(values = cols[selected]) +
   theme_bw() + labs(color = "method",
                     fill = "method",
                     y = "accuracy",
                     x = 'training size') +
   theme(legend.position = "bottom",
+        legend.title = element_blank(),
         axis.text.x = element_text(angle = 30))
 
-ggsave(paste0("images/accuracy_generated_4.pdf"),
-       plot = plot_acc4, width = 6, height=4)
+ggsave(paste0("images/accuracy_generated_4_sigmoid.pdf"),
+       plot = plot_acc4_sigmoid, width = 3.5, height=2.5)
+
+
+
+plot_acc4_gp <-
+  ggplot(D[D$alg %in% selected & D$variable == "acc" & 
+             D$mech %in% c("gp_add", "gp_mix"), ],
+         aes(
+           x = ntrain,
+           y = value.mean,
+           ymin = value.mean - zalpha*value.sd/sqrt(5),
+           ymax = value.mean + zalpha*value.sd/sqrt(5),
+           col = alg,
+           fill = alg
+         )) + geom_line() +
+  facet_grid(cols = vars(mech), scales = "free_y") +
+  geom_ribbon(alpha = 0.4, linetype = 0) +
+  #ylim(0,1) + 
+  scale_color_manual(values = cols[selected]) +
+  scale_fill_manual(values = cols[selected]) +
+  theme_bw() + labs(color = "method",
+                    fill = "method",
+                    y = "accuracy",
+                    x = 'training size') +
+  theme(legend.position = "bottom",
+        legend.title = element_blank(),
+        axis.text.x = element_text(angle = 30))
+
+ggsave(paste0("images/accuracy_generated_4_gp.pdf"),
+       plot = plot_acc4_gp, width = 3.5, height=2.5)
 
 
 
 DD <- aggregate(value ~ alg + ntrain + variable, data = data, FUN = mean)
+DD$alg[DD$alg == "smm_ensemble"] <- "SMMwE"
 
 plot_time <- ggplot(
   DD[DD$variable %in% c("t.train", "t.test"), ],
@@ -81,7 +116,7 @@ plot_time <- ggplot(
   facet_grid(cols = vars(variable), scales = "free_y") +
   #geom_ribbon(alpha = 0.4, linetype = 0) +
   scale_y_log10() +
-  scale_color_manual(values = cols) +
+  scale_color_manual(values = cols[selected]) +
   theme_bw() + labs(color = "method",
                     fill = "method",
                     y = "time (seconds)",
@@ -90,4 +125,4 @@ plot_time <- ggplot(
         axis.text.x = element_text(angle = 30))
 
 ggsave(paste0("images/time_exp2.pdf"),
-       plot = plot_time, width = 6, height = 4)
+       plot = plot_time, width = 3.5, height = 2.5)
