@@ -1,4 +1,4 @@
-from experiments import mixgenerated, generated_data, benchmarks 
+from experiments import tuebingen, mixgenerated, generated_data, benchmarks 
 from experiments import util 
 from itertools import product
 import os
@@ -16,6 +16,9 @@ parser.add_argument('--benchmarks', action='store_true',
 
 parser.add_argument('--mixgenerated', action='store_true',
                     help='run generated data experiment 2')
+
+parser.add_argument('--tuebingen', action='store_true',
+                    help='run generated tuebingen exp')
 
 
 
@@ -50,11 +53,11 @@ if args.generated1:
 
 
 if args.mixgenerated:
-    nrep = 10
-    ntrains = (5, 10, 20, )
+    nrep = 5
+    ntrains = (750, 1000)
     ntest = 1000
     size = 250
-    mechs = ('linear', 'nn', 'polynomial', 'sigmoid_add', 'sigmoid_mix', 'gp_add', 'gp_mix')
+    mechs = ('gp_add', 'gp_mix')
     noises = ('normal2',)
     ncoeffs = (0.5,)
     
@@ -84,6 +87,30 @@ if args.benchmarks:
         os.makedirs(path, exist_ok=True)
         for i in range(nrep):
             res = benchmarks.run(mechs=mechs,
+                                 noises=noises,
+                                 ncoeffs=ncoeffs,
+                                 ntrain=ntrain,
+                                 size=size) 
+            util.save_csv2(res, os.path.join(path, f'rep{i}.csv'))
+
+
+
+if args.tuebingen: 
+    nrep = 10
+    ## effective training size is ntrain * |mechs|*|noises|*|ncoeffs| 
+    ntrains = (500,) 
+    sizes = (500,)
+    mechs = ('nn', )
+    noises = ('normal2', 'uniform2')
+    ncoeffs = (0.5,)
+    
+    exp_set = product(sizes, ntrains)
+    for (size, ntrain) in exp_set:
+        path = os.path.join('results', 'tuebingen', 
+                f'mix_s{size}_ntrain{ntrain}')
+        os.makedirs(path, exist_ok=True)
+        for i in range(nrep):
+            res = tuebingen.run(mechs=mechs,
                                  noises=noises,
                                  ncoeffs=ncoeffs,
                                  ntrain=ntrain,
