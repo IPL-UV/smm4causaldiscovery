@@ -25,9 +25,9 @@ cols = c(
 dir.create("images", showWarnings = FALSE)
 
 mechs <- c("nn", "polynomial", "sigmoid_add", "sigmoid_mix", "gp_add", "gp_mix")
-noises <- c("normal2")
+noises <- c("normal2", "uniform2")
 sizes <- c(250)
-ntrains <- c(5,10)
+ntrains <- c(100)
 ncoefs <- c(0.5)
 ntests <- 1000
 

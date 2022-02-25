@@ -7,7 +7,7 @@ colors <- palette.colors(7, palette = "R4")
 names(colors) <- NULL
 
 cols = c(
-  "smm_ensemble" = colors[1],
+  "SMMwE" = colors[1],
   "avg" = colors[2],
   "vot" = colors[3],
   "best" = colors[4],
@@ -37,10 +37,12 @@ data <- load_results(mechs, noises, ncoefs, sizes, ntrains, ntests,
 D <- aggregate(value ~ mech + ncoef + size + ntrain + ntest + alg + variable + noise,
                data = data, FUN = mean )
 
-
-
+D$noise[D$noise == "normal2"] <- "normal" 
+D$noise[D$noise == "uniform2"] <- "uniform" 
+D$alg[D$alg=="smm_ensemble"] <- "SMMwE"
+selected <- c("SMMwE", "avg", "vot", "best")
 plot_acc1 <-
-  ggplot(D[D$alg %in% c("smm_ensemble", "avg", "vot", "best") & 
+  ggplot(D[D$alg %in% selected & 
                 D$variable == "acc", ],
          aes(
            x = size,
@@ -59,6 +61,7 @@ plot_acc1 <-
                     x = 'sample size') +
   coord_cartesian(ylim = c(0.4,1)) + 
   theme(legend.position = "bottom",
+	legend.title=element_blank(),
         axis.text.x = element_text(angle = 30))
 
 ## check colorblinder
@@ -73,8 +76,10 @@ ggsave(
 )
 
 
+
+selected <- c("SMMwE", "rcc", "jarfo", "best") 
 plot_acc2 <- ggplot(
-  D[D$alg %in% c("smm_ensemble", "rcc", "jarfo")  & 
+  D[D$alg %in% selected & 
     D$variable == "acc",],
   aes(
     x = size,
@@ -87,14 +92,15 @@ plot_acc2 <- ggplot(
   #ylim(0.5,1) + 
   #geom_ribbon(alpha = 0.4, linetype = 0) +
   facet_grid(rows = vars(noise), cols = vars(mech), scales = "free_y") +
-  scale_color_manual(values = cols) +
-  scale_fill_manual(values = cols) +
+  scale_color_manual(values = cols[selected]) +
+  scale_fill_manual(values = cols[selected]) +
   theme_bw() + labs(color = "method",
                     fill = "method",
                     y = "accuracy",
                     x = 'sample size') +
   coord_cartesian(ylim = c(0.25,1)) + 
   theme(legend.position = "bottom",
+	legend.title=element_blank(),
         axis.text.x = element_text(angle = 30))
 
 ggsave(
@@ -104,8 +110,42 @@ ggsave(
   height = 4
 )
 
+plot_acc2_mini <- ggplot(
+  D[D$alg %in% selected & 
+    D$mech %in% c('nn', 'polynomial', 'sigmoid_mix') & 
+    D$variable == "acc",],
+  aes(
+    x = size,
+    y = value,
+    group = alg,
+    col = alg,
+    fill = alg
+  )
+) + geom_line() +
+  #ylim(0.5,1) + 
+  #geom_ribbon(alpha = 0.4, linetype = 0) +
+  facet_grid(rows = vars(noise), cols = vars(mech), scales = "free_y") +
+  scale_color_manual(values = cols[selected]) +
+  scale_fill_manual(values = cols[selected]) +
+  theme_bw() + labs(color = "method",
+                    fill = "method",
+                    y = "accuracy",
+                    x = 'sample size') +
+  coord_cartesian(ylim = c(0.25,1)) + 
+  theme(legend.position = "bottom",
+	legend.title=element_blank(),
+        axis.text.x = element_text(angle = 30))
+
+ggsave(
+  filename = paste0("images/accuracy_generated_2_mini.pdf"),
+  plot = plot_acc2_mini,
+  width = 3.5,
+  height = 2.5
+)
+
+selected <- c("SMMwE", "ANM", "CDS", "BivariateFit", "IGCI", "RECI") 
 plot_acc3 <- ggplot(
-  D[D$alg %in% c("smm_ensemble", "ANM", "CDS", "BivariateFit", "IGCI", "RECI") & 
+  D[D$alg %in% selected &  
       D$variable == "acc", ],
   aes(
     x = size,
@@ -116,8 +156,8 @@ plot_acc3 <- ggplot(
   )
 ) + geom_line() +
   #ylim(0.5,1) + 
-  scale_color_manual(values = cols) +
-  scale_fill_manual(values = cols) +
+  scale_color_manual(values = cols[selected]) +
+  scale_fill_manual(values = cols[selected]) +
   #geom_ribbon(alpha = 0.4, linetype = 0) +
   facet_grid(rows = vars(noise), cols = vars(mech), scales = "free_y") +
   theme_bw() + labs(color = "method",
@@ -126,6 +166,7 @@ plot_acc3 <- ggplot(
                     x = 'sample size') +
   coord_cartesian(ylim = c(0.25,1)) + 
   theme(legend.position = "bottom",
+	legend.title=element_blank(),
         axis.text.x = element_text(angle = 30))
 
 # save plot
@@ -139,6 +180,7 @@ ggsave(
 
 DD <- aggregate(value ~ alg + size + variable, data = data, FUN = mean)
 
+DD$alg[DD$alg=="smm_ensemble"] <- "SMMwE"
 plot_time <- ggplot(
   DD[DD$variable %in% c("t.train", "t.test"), ],
   aes(
@@ -158,7 +200,8 @@ plot_time <- ggplot(
 		    y = "time (seconds)",
 		    x = 'sample size') +
   theme(legend.position = "bottom",
+	legend.title=element_blank(),
 	axis.text.x = element_text(angle = 30))
 
 ggsave(paste0("images/time_exp.pdf"),
-       plot = plot_time, width = 6, height = 4)
+       plot = plot_time, width = 2.5, height = 2.5)
