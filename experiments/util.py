@@ -48,15 +48,6 @@ def load_data(pairs, target):
     y = pd.read_csv(args.target).set_index('SampleID')
     return X, y
     
-def data_train_test(X, y, ntrain, ntest):
-    Xtrain = X.iloc[0:ntrain, :]
-    Xtest = X.iloc[ntrain:(ntrain+ntest), :]
-    
-    ytrain = y.iloc[0:ntrain, :]
-    ytest = y.iloc[ntrain:(ntrain+ntest), :]
-    return Xtrain, ytrain, Xtest, ytest
-
-
 def load_anlsmn(name = 'AN', rescale=True): 
     bp = path.join('data/ANLSMN_pairs/', name)
     data = []
