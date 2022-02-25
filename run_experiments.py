@@ -69,23 +69,10 @@ if args.mixgenerated:
                              rescale=True) 
 
 if args.benchmarks: 
-    nrep = 10
-    ## effective training size is ntrain * |mechs|*|noises|*|ncoeffs| 
-    ntrains = (10,) 
-    sizes = (250,)
-    mechs = ('nn', 'polynomial', 'sigmoid_add', 'sigmoid_mix', 'gp_add', 'gp_mix')
-    noises = ('normal2', 'uniform2')
-    ncoeffs = (1,)
+    nrep = 5
     
-    exp_set = product(sizes, ntrains)
-    for (size, ntrain) in exp_set:
-        path = os.path.join('results', 'benchmarks', 
-                f'mix_s{size}_ntrain{ntrain}')
-        os.makedirs(path, exist_ok=True)
-        for i in range(nrep):
-            res = benchmarks.run(mechs=mechs,
-                                 noises=noises,
-                                 ncoeffs=ncoeffs,
-                                 ntrain=ntrain,
-                                 size=size) 
-            util.save_csv2(res, os.path.join(path, f'rep{i}.csv'))
+    path = os.path.join('results', 'benchmarks')
+    os.makedirs(path, exist_ok=True)
+    for i in range(nrep):
+        res = benchmarks.run() 
+        util.save_csv2(res, os.path.join(path, f'rep{i}.csv'))
