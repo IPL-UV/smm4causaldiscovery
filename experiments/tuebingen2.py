@@ -1,5 +1,6 @@
 import cdt
 from sklearn.metrics import accuracy_score
+from sklearn.model_selection import train_test_split
 import time
 import argparse
 from smmw_ensemble import SMMwEnsemble
@@ -13,35 +14,37 @@ function to run experiment over benchmarks data sets
 '''
 
 
+def run():
 
-def run(mechs=('nn',), noises=('normal',),
-        ncoeffs=(0.1,),
-        ntrain=10, size=100):
+     # load tuebingen shuffled
+    Xall, yall = load_tuebingen(shuffle=True)
+#    for i in range(Xall.shape[0]):
+#        a = Xall.iloc[i,0]
+#        a = (a - a.mean()) / a.std()
+#        Xall.iloc[i,0] = a
+#        b = Xall.iloc[i,1]
+#        b = (b - b.mean()) / b.std()
+#        Xall.iloc[i,1] = b
 
-    gen=cdt.data.CausalPairGenerator('linear', noise_coeff=0.4)
-    X, y = gen.generate(1, npoints=size, rescale=True)
-    for mech in mechs:
-        for noise in noises:
-            for ncoeff in ncoeffs:
-                gen=cdt.data.CausalPairGenerator(mech, noise = noise_funcs[noise], 
-                                                 noise_coeff=ncoeff)
-                X1, y1 = gen.generate(ntrain, npoints=size, rescale=True)
-                X=X.append(X1)
-                y=y.append(y1)
-    
+    X, Xt, y, yt = train_test_split(Xall, yall, test_size = 0.5) 
+
+
     train_time = {} 
     print('start meta causal')
     start = time.time()
     model = SMMwEnsemble({
         "CDS" : cdt.causality.pairwise.CDS(),
-        "ANM" : fastANM(), 
-        "BivariateFit" : fastBV(), 
+        "fastANM": fastANM(),
+        'fastBV': fastBV(),
+        #"ANM" : cdt.causality.pairwise.ANM(), 
+        #"BivariateFit" : cdt.causality.pairwise.BivariateFit(), 
         "IGCI" : fIGCI(), 
         "RECI": fRECI()},
         include_constant=False,
         exp_weights=False,
         param_grid = {"C": np.logspace(-4, 8, 50)},
-        size = 250,
+        #C = 0.01,
+        size = 500,
         parallel=True,
         verbose=True,
         gamma=0.5)
@@ -67,19 +70,9 @@ def run(mechs=('nn',), noises=('normal',),
     train_time['rcc'] = end - start
     print(f'rcc fitted in {end-start} seconds') 
 
+
+    print('test')
     allscores = {}
-    # testing
-    Xt, yt = load_tuebingen(shuffle=True)
-    for i in range(Xt.shape[0]):
-        a = Xt.iloc[i,0]
-        a = (a - a.mean()) / a.std()
-        Xt.iloc[i,0] = a
-        b = Xt.iloc[i,1]
-        b = (b - b.mean()) / b.std()
-        Xt.iloc[i,1] = b
-
-
-  
     test_time = {}
 
     # smm
@@ -97,7 +90,9 @@ def run(mechs=('nn',), noises=('normal',),
 
     #rcc
     start = time.time()
-    rcc_score = accuracy_score(yt, np.sign(rcc.predict(Xt))) 
+    pred = np.sign(rcc.predict(Xt))
+    rcc_score = accuracy_score(yt, pred)
+    print(f'rcc score {rcc_score}')
     end = time.time() 
     test_time['rcc'] = end - start
 

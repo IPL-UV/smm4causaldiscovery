@@ -20,7 +20,7 @@ tab.std <- acast(std,  X ~ variable)
 tab.all <- matrix(paste0(tab.avg, " (",format(tab.std, digits = 1),")"), 
                   nrow = nrow(tab.avg), 
                   dimnames = list(rownames(tab.avg), colnames(tab.avg)))
-select <- c("SMMwE",  "rcc", "best")
+select <- c("SMMwE",  "rcc", "avg")
 idx <- which(rownames(tab.all) %in% select)
 print(xtable(t(tab.all[idx,])))
 

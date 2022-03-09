@@ -56,7 +56,7 @@ def run():
         param_grid = {"C": np.logspace(-3, 5, 20)},
         parallel=True,
         verbose=True,
-        gamma=100)
+        gamma=0.5)
     
     model.fit(X, y) 
     end = time.time() 

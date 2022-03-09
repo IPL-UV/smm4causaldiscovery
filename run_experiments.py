@@ -1,4 +1,4 @@
-from experiments import tuebingen, mixgenerated, generated_data, benchmarks 
+from experiments import tuebingen2, tuebingen, mixgenerated, generated_data, benchmarks 
 from experiments import util 
 from itertools import product
 import os
@@ -18,6 +18,9 @@ parser.add_argument('--mixgenerated', action='store_true',
                     help='run generated data experiment 2')
 
 parser.add_argument('--tuebingen', action='store_true',
+                    help='run generated tuebingen exp')
+
+parser.add_argument('--tuebingen2', action='store_true',
                     help='run generated tuebingen exp')
 
 
@@ -84,7 +87,7 @@ if args.tuebingen:
     nrep = 10
     ## effective training size is ntrain * |mechs|*|noises|*|ncoeffs| 
     ntrains = (500,) 
-    sizes = (500,)
+    sizes = (250,)
     mechs = ('nn', )
     noises = ('normal2', 'uniform2')
     ncoeffs = (0.5,)
@@ -101,3 +104,12 @@ if args.tuebingen:
                                  ntrain=ntrain,
                                  size=size) 
             util.save_csv2(res, os.path.join(path, f'rep{i}.csv'))
+
+
+if args.tuebingen2: 
+    nrep = 20
+    path = os.path.join('results', 'tuebingen')
+    os.makedirs(path, exist_ok=True)
+    for i in range(nrep):
+        res = tuebingen2.run() 
+        util.save_csv2(res, os.path.join(path, f'rep{i}.csv'))

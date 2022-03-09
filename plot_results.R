@@ -7,7 +7,7 @@ colors <- palette.colors(7, palette = "R4")
 names(colors) <- NULL
 
 cols = c(
-  "SMMwE" = colors[1],
+  "CEMM" = colors[1],
   "avg" = colors[2],
   "vot" = colors[3],
   "best" = colors[4],
@@ -39,8 +39,8 @@ D <- aggregate(value ~ mech + ncoef + size + ntrain + ntest + alg + variable + n
 
 D$noise[D$noise == "normal2"] <- "normal" 
 D$noise[D$noise == "uniform2"] <- "uniform" 
-D$alg[D$alg=="smm_ensemble"] <- "SMMwE"
-selected <- c("SMMwE", "avg", "vot", "best")
+D$alg[D$alg=="smm_ensemble"] <- "CEMM"
+selected <- c("CEMM", "avg", "vot", "best")
 plot_acc1 <-
   ggplot(D[D$alg %in% selected & 
                 D$variable == "acc", ],
@@ -77,7 +77,7 @@ ggsave(
 
 
 
-selected <- c("SMMwE", "rcc", "jarfo", "best") 
+selected <- c("CEMM", "rcc", "jarfo", "best") 
 plot_acc2 <- ggplot(
   D[D$alg %in% selected & 
     D$variable == "acc",],
@@ -140,10 +140,10 @@ ggsave(
   filename = paste0("images/accuracy_generated_2_mini.pdf"),
   plot = plot_acc2_mini,
   width = 3.5,
-  height = 2.5
+  height = 3.5
 )
 
-selected <- c("SMMwE", "ANM", "CDS", "BivariateFit", "IGCI", "RECI") 
+selected <- c("CEMM", "ANM", "CDS", "BivariateFit", "IGCI", "RECI") 
 plot_acc3 <- ggplot(
   D[D$alg %in% selected &  
       D$variable == "acc", ],
@@ -180,7 +180,7 @@ ggsave(
 
 DD <- aggregate(value ~ alg + size + variable, data = data, FUN = mean)
 
-DD$alg[DD$alg=="smm_ensemble"] <- "SMMwE"
+DD$alg[DD$alg=="smm_ensemble"] <- "CEMM"
 plot_time <- ggplot(
   DD[DD$variable %in% c("t.train", "t.test"), ],
   aes(
