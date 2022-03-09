@@ -39,8 +39,8 @@ D <- aggregate(value ~ mech + noise + ncoef + size + ntrain + ntest + alg + vari
                data = data, FUN = function(x) c(mean = mean(x, na.rm = TRUE), sd = sd(x, na.rm = TRUE)) )
 D <- na.omit(do.call(data.frame, D))
 
-D$alg[D$alg == "smm_ensemble"] <- "SMMwE"
-selected <- c("SMMwE", "rcc", "jarfo", "best")
+D$alg[D$alg == "smm_ensemble"] <- "CEMM"
+selected <- c("CEMM", "rcc", "jarfo", "best")
 #selected <- c("smm_ensemble", "ANM", "CDS", "BivariateFit", "IGCI", "RECI")
 plot_acc4_sigmoid <-
   ggplot(D[D$alg %in% selected & D$variable == "acc" & 
