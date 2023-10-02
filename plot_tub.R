@@ -14,13 +14,13 @@ library(reshape2)
 
 D <- melt(data, id.vars=c("V1", "V2"))
 pp <- ggplot(D) + geom_hex(aes(x = V1, y = V2 ), bins = 30) + 
-  xlab("")+ylab("")+
+  xlab("X")+ylab("Y")+
   facet_wrap(vars(L1), scales = "free", nrow = 2) + theme_bw() + 
   theme(
     legend.position = "none",
     strip.background = element_blank(),
     strip.text.x = element_blank(),
-    axis.title = element_blank(),
+    #axis.title = element_blank(),
     axis.text = element_blank(),
     axis.ticks = element_blank(),panel.grid = element_blank()
   ) 

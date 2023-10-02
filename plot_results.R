@@ -1,5 +1,5 @@
 library(ggplot2)
-library(colorblindr)
+#library(colorblindr)
 source("plot_util.R")
 
 ## this should be colorblind-safe
@@ -22,6 +22,9 @@ cols = c(
   "RECI" = colors[6]
 )
 
+
+fwidth <- 7 #390 / 72
+height <- 3
 dir.create("images", showWarnings = FALSE)
 
 mechs <- c("nn", "polynomial", "sigmoid_add", "sigmoid_mix", "gp_add", "gp_mix")
@@ -71,8 +74,8 @@ plot_acc1 <-
 ggsave(
   filename = paste0("images/accuracy_generated_1.pdf"),
   plot = plot_acc1,
-  width = 6,
-  height = 4
+  width = fwidth,
+  height = 3,
 )
 
 
@@ -99,15 +102,15 @@ plot_acc2 <- ggplot(
                     y = "accuracy",
                     x = 'sample size') +
   coord_cartesian(ylim = c(0.25,1)) + 
-  theme(legend.position = "bottom",
+  theme(legend.position = "none",
 	legend.title=element_blank(),
         axis.text.x = element_text(angle = 30))
 
 ggsave(
   filename = paste0("images/accuracy_generated_2.pdf"),
   plot = plot_acc2,
-  width = 6,
-  height = 4
+  width = fwidth,
+  height = 3
 )
 
 plot_acc2_mini <- ggplot(
@@ -190,18 +193,18 @@ plot_time <- ggplot(
     col = alg,
     fill = alg
   )
-) + geom_line(size = 1) +
+) + geom_line(linewidth = 1) +
   facet_grid(cols = vars(variable), scales = "free_y") +
   #geom_ribbon(alpha = 0.4, linetype = 0) +
   scale_y_log10() +
-  scale_color_manual(values = cols) +
+  scale_color_manual(values = cols, limits = c("CEMM", "jarfo", "rcc")) +
   theme_bw() + labs(color = "method",
 		    fill = "method",
 		    y = "time (seconds)",
 		    x = 'sample size') +
-  theme(legend.position = "bottom",
+  theme(legend.position = "none",
 	legend.title=element_blank(),
 	axis.text.x = element_text(angle = 30))
 
 ggsave(paste0("images/time_exp.pdf"),
-       plot = plot_time, width = 2.5, height = 2.5)
+       plot = plot_time, width = fwidth, height = 2.5)

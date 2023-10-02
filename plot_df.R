@@ -35,10 +35,12 @@ pp <- ggplot(D, aes(x = value, y =variable,  fill = variable)) +
 	scale_fill_manual(values = cols) + 
 	xlim(-2.2,2.2) + 
 	#scale_x_continuous(expand = c(0,0)) +
-	xlab("") + ylab("") + 
+	xlab("CMM decision function") + ylab("") + 
 	labs(fill = "method") + 
 	#theme_ridges() + 
 	theme_bw() + 
 	theme(legend.position = "none")
 
- ggsave(pp, file = "images/plot_df.pdf", width = 3, height = 2.5)
+
+fwidth <- 390 / 72
+ggsave(pp, file = "images/plot_df.pdf", width = fwidth, height = 3)

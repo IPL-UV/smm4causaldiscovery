@@ -1,5 +1,5 @@
 library(ggplot2)
-library(colorblindr)
+#library(colorblindr)
 source("plot_util.R")
 
 ## this should be colorblind-safe
@@ -7,7 +7,7 @@ colors <- palette.colors(7, palette = "R4")
 names(colors) <- NULL
 
 cols = c(
-  "SMMwE" = colors[1],
+  "CEMM" = colors[1],
   "avg" = colors[2],
   "vot" = colors[3],
   "best" = colors[4],
@@ -63,11 +63,12 @@ plot_acc4_sigmoid <-
                     y = "accuracy",
                     x = 'training size') +
   theme(legend.position = "bottom",
+        legend.box.spacing = unit(0, "cm"),
         legend.title = element_blank(),
         axis.text.x = element_text(angle = 30))
 
 ggsave(paste0("images/accuracy_generated_4_sigmoid.pdf"),
-       plot = plot_acc4_sigmoid, width = 3.5, height=2.5)
+       plot = plot_acc4_sigmoid, width = 4.5, height=2.5)
 
 
 
@@ -93,15 +94,16 @@ plot_acc4_gp <-
                     x = 'training size') +
   theme(legend.position = "bottom",
         legend.title = element_blank(),
+        legend.box.spacing = unit(0, "cm"),
         axis.text.x = element_text(angle = 30))
 
 ggsave(paste0("images/accuracy_generated_4_gp.pdf"),
-       plot = plot_acc4_gp, width = 3.5, height=2.5)
+       plot = plot_acc4_gp, width = 4.5, height=2.5)
 
 
 
 DD <- aggregate(value ~ alg + ntrain + variable, data = data, FUN = mean)
-DD$alg[DD$alg == "smm_ensemble"] <- "SMMwE"
+DD$alg[DD$alg == "smm_ensemble"] <- "CEMM"
 
 plot_time <- ggplot(
   DD[DD$variable %in% c("t.train", "t.test"), ],
@@ -122,6 +124,8 @@ plot_time <- ggplot(
                     y = "time (seconds)",
                     x = 'training size') +
   theme(legend.position = "bottom",
+        legend.title = element_blank(),
+        legend.box.spacing = unit(0, "cm"),
         axis.text.x = element_text(angle = 30))
 
 ggsave(paste0("images/time_exp2.pdf"),
