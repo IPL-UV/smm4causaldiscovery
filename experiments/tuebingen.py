@@ -77,8 +77,6 @@ def run(mechs=('nn',), noises=('normal',),
         b = Xt.iloc[i,1]
         b = (b - b.mean()) / b.std()
         Xt.iloc[i,1] = b
-
-
   
     test_time = {}
 

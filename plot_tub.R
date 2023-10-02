@@ -1,6 +1,6 @@
 
 
-idx <- c(5, 8, 10, 12 ,15, 17, 22, 28)
+idx <- c(5, 8, 10, 12 ,15, 22, 28, 19)
 data <- lapply(idx, function(i){
   print(i)
   read.table(paste0("data/tuebingen_benchmark/pair",  sprintf("%04d",i),".txt"),

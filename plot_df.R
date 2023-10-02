@@ -3,8 +3,7 @@ library("ggplot2")
 library("ggridges")
 source("plot_util.R")
 
-mechs <- c("linear", "nn", "polynomial", "sigmoid_add", 
-           "sigmoid_mix", "gp_add", "gp_mix")
+mechs <- c("sigmoid_add", "sigmoid_mix")
 sizes <- c(250)
 ntrains <- c(500, 750, 1000)
 noises <- c("normal2")
@@ -35,12 +34,11 @@ pp <- ggplot(D, aes(x = value, y =variable,  fill = variable)) +
 	scale_fill_manual(values = cols) + 
 	xlim(-2.2,2.2) + 
 	#scale_x_continuous(expand = c(0,0)) +
-	xlab("CMM decision function") + ylab("") + 
+	xlab("CEMM weight") + ylab("") + 
 	labs(fill = "method") + 
 	#theme_ridges() + 
 	theme_bw() + 
 	theme(legend.position = "none")
 
-
 fwidth <- 390 / 72
-ggsave(pp, file = "images/plot_df.pdf", width = fwidth, height = 3)
+ggsave(pp, file = "images/plot_df.pdf", width = fwidth, height =  3)

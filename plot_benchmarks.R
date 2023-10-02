@@ -1,5 +1,4 @@
 library(ggplot2)
-library(colorblindr)
 source("plot_util.R")
 
 ## this should be colorblind-safe
@@ -61,8 +60,6 @@ plot_acc1 <-
   theme(legend.position = "bottom",
         axis.text.x = element_text(angle = 30))
 
-## check colorblinder
-#colorblindr::view_cvd(plot_acc1)
 
 # save plot
 ggsave(
