@@ -1,5 +1,4 @@
 library(ggplot2)
-library(colorblindr)
 source("plot_util.R")
 
 ## this should be colorblind-safe
@@ -24,7 +23,7 @@ cols = c(
 
 dir.create("images", showWarnings = FALSE)
 
-mechs <- c("sigmoid_add", "sigmoid_mix", "gp_add", "gp_mix")
+mechs <- c("nn", "polynomial", "sigmoid_add", "sigmoid_mix", "gp_add", "gp_mix")
 noises <- c("normal2")
 sizes <- c(250)
 ntrains <- c(50, 100, 250, 500, 750, 1000)
@@ -66,8 +65,9 @@ plot_acc4_sigmoid <-
         legend.title = element_blank(),
         axis.text.x = element_text(angle = 30))
 
+fwidth <- 390 / 72
 ggsave(paste0("images/accuracy_generated_4_sigmoid.pdf"),
-       plot = plot_acc4_sigmoid, width = 3.5, height=2.5)
+       plot = plot_acc4_sigmoid, width = fwidth, height=2.5)
 
 
 

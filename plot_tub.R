@@ -1,6 +1,6 @@
 
 
-idx <- c(5, 8, 10, 12 ,15, 17, 22, 28)
+idx <- c(5, 8, 10, 12 ,15, 22, 28, 19)
 data <- lapply(idx, function(i){
   print(i)
   read.table(paste0("data/tuebingen_benchmark/pair",  sprintf("%04d",i),".txt"),
@@ -14,7 +14,7 @@ library(reshape2)
 
 D <- melt(data, id.vars=c("V1", "V2"))
 pp <- ggplot(D) + geom_hex(aes(x = V1, y = V2 ), bins = 30) + 
-  xlab("")+ylab("")+
+  xlab("X")+ylab("Y")+
   facet_wrap(vars(L1), scales = "free", nrow = 2) + theme_bw() + 
   theme(
     legend.position = "none",
