@@ -1,5 +1,6 @@
 import cdt
 from sklearn.metrics import accuracy_score
+from sklearn.model_selection import train_test_split
 import time
 import argparse
 from smmw_ensemble import SMMwEnsemble
@@ -7,6 +8,7 @@ import numpy as np
 from base_methods import fIGCI, fRECI
 from cdt.data import load_dataset
 from .util import load_anlsmn, load_sim, noise_funcs
+import pandas as pd
 
 '''
 function to run experiment over benchmarks data sets
@@ -19,21 +21,26 @@ benchmarks = { 'ANLSMN' : {'load' : load_anlsmn, 'names' : anlsmn},
         'SIM': {'load' : load_sim, 'names' : sim}}
         #'tuebingen': {'load': load_dataset , 'names': ('tuebingen',) }}
 
-def run(mechs=('nn',), noises=('normal',),
-        ncoeffs=(0.1,),
-        ntrain=10, size=100):
+def run():
 
+    Xtrain_all = []
+    ytrain_all = []
+    test = {}
+    for key, bench in benchmarks.items():
+        load = bench['load']
+        names = bench['names']
+        for name in names:
+            X, y = load(name)
+            Xtrain, Xtest, ytrain, ytest = train_test_split(X, y, test_size = 0.5)
+            Xtrain_all += (Xtrain,)
+            ytrain_all += (ytrain,)
+            test[name] = { 'X':Xtest, 'y': ytest}
 
-    gen=cdt.data.CausalPairGenerator('linear', noise_coeff=0.4)
-    X, y = gen.generate(1, npoints=size, rescale=True)
-    for mech in mechs:
-        for noise in noises:
-            for ncoeff in ncoeffs:
-                gen=cdt.data.CausalPairGenerator(mech, noise = noise_funcs[noise], 
-                                                 noise_coeff=ncoeff)
-                X1, y1 = gen.generate(ntrain, npoints=size, rescale=True)
-                X=X.append(X1)
-                y=y.append(y1)
+    print(len(Xtrain_all))
+    X = pd.concat(Xtrain_all)
+    print(X.shape)
+    y = pd.concat(ytrain_all)
+    print(y.shape)
     
     train_time = {} 
     print('start meta causal')
@@ -47,9 +54,9 @@ def run(mechs=('nn',), noises=('normal',),
         include_constant=False,
         exp_weights=False,
         param_grid = {"C": np.logspace(-3, 5, 20)},
-        parallel=False,
+        parallel=True,
         verbose=True,
-        gamma='median')
+        gamma=0.5)
     
     model.fit(X, y) 
     end = time.time() 
@@ -78,7 +85,8 @@ def run(mechs=('nn',), noises=('normal',),
         load = bench['load']
         names = bench['names']
         for name in names:
-            Xt, yt = load(name)
+            Xt = test[name]['X']
+            yt = test[name]['y']
   
             test_time = {}
 

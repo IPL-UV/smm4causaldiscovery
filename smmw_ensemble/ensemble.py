@@ -191,6 +191,7 @@ class SMMwEnsemble():
 
 def _predict_base(nm, cl, X):
     # obtain base model predictions 
+    print(f'running base method {nm}')
     if cl is None:
         return nm, np.ones(X.shape[0])
     else:
