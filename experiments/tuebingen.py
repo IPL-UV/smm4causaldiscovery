@@ -13,7 +13,6 @@ function to run experiment over benchmarks data sets
 '''
 
 
-benchmarks = {'tuebingen': {'load': load_dataset , 'names': ('tuebingen',) }}
 
 def run(mechs=('nn',), noises=('normal',),
         ncoeffs=(0.1,),
@@ -34,11 +33,7 @@ def run(mechs=('nn',), noises=('normal',),
     print('start meta causal')
     start = time.time()
     model = SMMwEnsemble({
-        "CDS" : cdt.causality.pairwise.CDS(),
-        "ANM" : cdt.causality.pairwise.ANM(), 
-        "BivariateFit" : cdt.causality.pairwise.BivariateFit(), 
-        "IGCI" : fIGCI(), 
-        "RECI": fRECI()},
+        "const" : None},
         include_constant=False,
         exp_weights=False,
         param_grid = {"C": np.logspace(-3, 5, 20)},
@@ -70,45 +65,39 @@ def run(mechs=('nn',), noises=('normal',),
 
     allscores = {}
     # testing
-    for key, bench in benchmarks.items():
-        load = bench['load']
-        names = bench['names']
-        for name in names:
-            Xt, yt = load(name)
+    Xt, yt = load_dataset('tuebingen', shuffle=True)
   
-            test_time = {}
+    test_time = {}
 
-            # smm
-            start = time.time()
-            if name == 'tuebingen':
-                model.parallel=False
-            smm_score = model.score(Xt,yt) 
-            model.parallel = True
-            end = time.time() 
-            test_time['smm_ensemble'] = end - start
+    # smm
+    start = time.time()
+    smm_score = model.score(Xt,yt) 
+    model.parallel = True
+    end = time.time() 
+    test_time['smm_ensemble'] = end - start
 
-            # jarfo 
-            start = time.time()
-            jarfo_score = accuracy_score(yt, np.sign(jarfo.predict(Xt))) 
-            end = time.time() 
-            test_time['jarfo'] = end - start
+    # jarfo 
+    start = time.time()
+    jarfo_score = accuracy_score(yt, np.sign(jarfo.predict(Xt))) 
+    end = time.time() 
+    test_time['jarfo'] = end - start
 
-            #rcc
-            start = time.time()
-            rcc_score = accuracy_score(yt, np.sign(rcc.predict(Xt))) 
-            end = time.time() 
-            test_time['rcc'] = end - start
+    #rcc
+    start = time.time()
+    rcc_score = accuracy_score(yt, np.sign(rcc.predict(Xt))) 
+    end = time.time() 
+    test_time['rcc'] = end - start
 
-            #get all scores 
-            scores = {'smm_ensemble': smm_score, 
-                      "jarfo": jarfo_score,
-                      "rcc": rcc_score
-                      }
+    #get all scores 
+    scores = {'smm_ensemble': smm_score, 
+              "jarfo": jarfo_score,
+              "rcc": rcc_score
+              }
 
-            # add scores of alternative ensembles
-            scores.update(model.score_alternatives(yt))
-            # add scores of base methods
-            scores.update(model.score_base(yt))
-            allscores.update({name : scores})
+    # add scores of alternative ensembles
+    scores.update(model.score_alternatives(yt))
+    # add scores of base methods
+    scores.update(model.score_base(yt))
+    allscores.update({'tuebingen' : scores})
 
     return allscores
