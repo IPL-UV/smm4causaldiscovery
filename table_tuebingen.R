@@ -22,6 +22,6 @@ tab.all <- matrix(paste0(format(tab.avg, digits = 2), " (",format(tab.std, digit
                   dimnames = list(rownames(tab.avg), colnames(tab.avg)))
 select <- c("CEMM",  "rcc", "jarfo", "best", "vot", "avg", "fastANM", "RECI", "IGCI", "fastBV", "CDS")
 idx <- which(rownames(tab.all) %in% select)
-print(xtable(tab.all[select,, drop =FALSE]), booktabs = TRUE, include.rownames = TRUE)
+print(xtable(t(tab.all[select,, drop =FALSE])), booktabs = TRUE, include.rownames = TRUE)
 
 

@@ -2,7 +2,7 @@ library("reshape2")
 library("xtable")
 
 all_res <- melt(lapply(0:4, function(i){
-  read.csv(paste0("results/benchmarks/rep", i, ".csv"))
+  read.csv(paste0("results/benchmarks/old stuff/rep", i, ".csv"))
 }))
 
 avg <- aggregate(value ~ X + variable, data = all_res, 

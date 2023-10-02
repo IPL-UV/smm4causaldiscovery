@@ -49,12 +49,13 @@ def run():
         "CDS" : cdt.causality.pairwise.CDS(),
         "ANM" : cdt.causality.pairwise.ANM(), 
         "BivariateFit" : cdt.causality.pairwise.BivariateFit(), 
-        "IGCI" : fIGCI(), 
+        "IGCI" : cdt.causality.pairwise.IGCI(), 
         "RECI": fRECI()},
         include_constant=False,
         exp_weights=False,
-        param_grid = {"C": np.logspace(-3, 5, 20)},
+        param_grid = {"C": np.logspace(-5, 7, 20)},
         parallel=True,
+        njobs=5,
         verbose=True,
         gamma=0.5)
     
@@ -80,6 +81,7 @@ def run():
     print(f'rcc fitted in {end-start} seconds') 
 
     allscores = {}
+    alldfs= {}
     # testing
     for key, bench in benchmarks.items():
         load = bench['load']
@@ -122,5 +124,6 @@ def run():
             # add scores of base methods
             scores.update(model.score_base(yt))
             allscores.update({name : scores})
+            alldfs.update({name : model.smms_df}) 
 
-    return allscores
+    return allscores, alldfs
