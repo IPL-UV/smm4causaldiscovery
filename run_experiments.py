@@ -79,8 +79,10 @@ if args.benchmarks:
     path = os.path.join('results', 'benchmarks')
     os.makedirs(path, exist_ok=True)
     for i in range(nrep):
-        res = benchmarks.run() 
+        res, dfs = benchmarks.run() 
         util.save_csv2(res, os.path.join(path, f'rep{i}.csv'))
+        for key, df in dfs.items():
+            util.save_csv2(df, os.path.join(path, f'df_rep{i}_{key}.csv'))
 
 
 if args.tuebingen: 
